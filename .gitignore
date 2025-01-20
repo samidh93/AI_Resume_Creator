@@ -72,5 +72,10 @@ Thumbs.db
 
 
 # user files
-output
-input
+output/*.yaml
+output/*.pdf
+output/*.html
+input/*.yaml
+input/*.pdf
+input/*.html
+input/*.css
