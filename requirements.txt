@@ -1,0 +1,4 @@
+# dependencies
+pyyaml
+openai
+pyppeteer

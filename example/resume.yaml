@@ -1,0 +1,111 @@
+personal_information:
+  name: "Jane"
+  surname: "Smith"
+  date_of_birth: "1992-04-15"
+  country: "United States"
+  city: "San Francisco"
+  address: "456 Tech Avenue"
+  phone_prefix: "+1"
+  phone: "555-9876"
+  email: "jane.smith@email.com"
+  github: "janesmith"
+  linkedin: "jane-smith-tech"
+
+summary: "Results-driven Software Engineer with 5+ years of experience in full-stack development, specializing in Python and JavaScript. Proven track record of delivering scalable web applications and optimizing system performance. Strong focus on clean code and agile methodologies."
+
+education:
+  - degree: "Master of Science"
+    university: "Stanford University"
+    gpa: "3.9"
+    graduation_year: "2018"
+    field_of_study: "Computer Science"
+  
+  - degree: "Bachelor of Engineering"
+    university: "MIT"
+    gpa: "3.8"
+    graduation_year: "2016"
+    field_of_study: "Software Engineering"
+
+experiences:
+  - position: "Senior Software Engineer"
+    company: "Tech Innovations Inc."
+    employment_period: "2019-Present"
+    location: "San Francisco, CA"
+    industry: "Technology"
+    key_responsibilities:
+      - description: "Led a team of 5 developers in building a cloud-based analytics platform"
+      - description: "Improved system performance by 40% through optimization of database queries"
+      - description: "Implemented CI/CD pipeline reducing deployment time by 60%"
+    skills_acquired:
+      - "Python"
+      - "AWS"
+      - "Docker"
+      - "Kubernetes"
+      - "PostgreSQL"
+
+  - position: "Software Engineer"
+    company: "StartUp Solutions"
+    employment_period: "2016-2019"
+    location: "Boston, MA"
+    industry: "Software"
+    key_responsibilities:
+      - description: "Developed RESTful APIs for mobile applications"
+      - description: "Implemented automated testing reducing bugs by 30%"
+    skills_acquired:
+      - "JavaScript"
+      - "Node.js"
+      - "MongoDB"
+      - "React Native"
+
+skills:
+  - category: "Programming Languages"
+    name: "Python"
+    level: "Expert"
+  - category: "Programming Languages"
+    name: "JavaScript"
+    level: "Advanced"
+  - category: "Frameworks"
+    name: "React"
+    level: "Advanced"
+  - category: "Cloud Services"
+    name: "AWS"
+    level: "Proficient"
+  - category: "Tools"
+    name: "Docker"
+    level: "Advanced"
+
+projects:
+  - name: "AI-Powered Resume Generator"
+    description: "Developed an AI-powered resume generator using OpenAI's GPT models"
+    link: "https://github.com/janesmith/ai-resume"
+  - name: "E-commerce Platform"
+    description: "Built a scalable e-commerce platform using microservices architecture"
+    link: "https://github.com/janesmith/ecommerce"
+
+achievements:
+  - name: "Best Technical Innovation Award"
+    description: "Awarded for developing an AI-powered code review system"
+  - name: "Speaker at PyCon 2022"
+    description: "Presented on 'Scaling Python Applications in the Cloud'"
+
+certifications:
+  - name: "AWS Solutions Architect Professional"
+    issuer: "Amazon Web Services"
+    date: "2022"
+    url: "https://aws.amazon.com/certification"
+  - name: "Google Cloud Professional Developer"
+    issuer: "Google Cloud"
+    date: "2021"
+    url: "https://cloud.google.com/certification"
+
+languages:
+  - language: "English"
+    proficiency: "Native"
+  - language: "Spanish"
+    proficiency: "Intermediate"
+
+interests:
+  - "Open Source Development"
+  - "Machine Learning"
+  - "Cloud Architecture"
+  - "Technical Writing"
