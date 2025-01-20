@@ -1,9 +1,9 @@
 import logging
 from pathlib import Path
-from python.openai_interface import OpenAIInterface
+from .openai_interface import OpenAIInterface
 import asyncio
 from pyppeteer import launch
-from job_description_interface import JobDescriptionInterface
+from .job_description_interface import JobDescriptionInterface
 
 class ResumeGenerator:
     def __init__(self, resume_path: str, style_path: str, output_dir: Path):

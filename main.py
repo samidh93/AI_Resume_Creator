@@ -42,6 +42,7 @@ def main():
         ai_model = args.ai_model or secrets['ai_model']
         resume_generator = ResumeGenerator(resume_path, style_path, output_dir)
         if args.job_description_url:
+            logging.info('job_description_url provided: %s' % args.job_description_url)
             resume_generator.generate_resume_with_job_description(ai_model, api_key, args.job_description_url)
         else:
             resume_generator.generate_resume(ai_model, api_key)

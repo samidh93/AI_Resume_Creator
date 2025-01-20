@@ -1,6 +1,6 @@
 # interface to get the correct job description based on url
 import asyncio
-import linkedin_job_description
+from .linkedin_job_description import LinkedinJobDescription
 
 class JobDescriptionInterface:
     def __init__(self, job_description_url):
@@ -13,7 +13,7 @@ class JobDescriptionInterface:
 
     def detect_the_platform(self):
         if self.job_description_url.startswith("https://www.linkedin.com/jobs"):
-            return linkedin_job_description.LinkedinJobDescription(self.job_description_url)
+            return LinkedinJobDescription(self.job_description_url)
         else:
             return None
 
