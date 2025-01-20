@@ -3,3 +3,4 @@ openai
 pyppeteer
 requests
 beautifulsoup4
+pytest

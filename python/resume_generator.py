@@ -24,6 +24,7 @@ class ResumeGenerator:
         # create job description interface
         job_description_interface = JobDescriptionInterface(job_description)
         job_description = job_description_interface.get_text_job_description()
+        logging.info('Job description: %s' % job_description)
         # switch AI model
         if ai_model == 'openai':
             self.generate_resume_using_gpt(api_key, job_description=job_description)
@@ -56,7 +57,7 @@ class ResumeGenerator:
                 ### Job Description
                 {job_description}
                 """
-
+        logging.info('Prompt: %s' % prompt_html)
         # Prepare the message for ChatCompletion
         messages = [
             {
