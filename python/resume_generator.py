@@ -44,7 +44,7 @@ class ResumeGenerator:
         # prompt
         prompt_html = f"""
                 Act as an HR expert and create a resume that passes ATS checks using the attached Yaml Content.
-                write city, country. place education after experiences. sort the data by date in descending order.
+                write city, country. place education after experiences. sort the data in all sections by date in descending order.
                 Use the provided CSS Content for styling. Generate the resume in valid HTML format. Do not include any other text.
                 If the job description is provided and not empty, tailor the resume to the job description and highlight relevant skills.
                 return only the html code for the resume. skip the ``` html
