@@ -22,7 +22,7 @@ def parse_arguments():
     parser.add_argument('--output', type=str, default='output', help='Output directory for generated files')
     parser.add_argument('--ai_model', type=str, default='openai', help='AI model to use (openai or gemini)')
     parser.add_argument('--api_key', type=str, default=None, help='API key for the AI model')
-    parser.add_argument('--job_description_url', type=str, default=None, help='Job description Url')
+    parser.add_argument('--url', type=str, default=None, help='Job description Url')
     return parser.parse_args()
 
 def main():
@@ -41,9 +41,9 @@ def main():
         api_key = args.api_key or secrets['api_key']
         ai_model = args.ai_model or secrets['ai_model']
         resume_generator = ResumeGenerator(resume_path, style_path, output_dir)
-        if args.job_description_url:
-            logging.info('job_description_url provided: %s' % args.job_description_url)
-            resume_generator.generate_resume_with_job_description(ai_model, api_key, args.job_description_url)
+        if args.url:
+            logging.info('url provided: %s' % args.url)
+            resume_generator.generate_resume_with_job_description(ai_model, api_key, args.url)
         else:
             resume_generator.generate_resume(ai_model, api_key)
 
