@@ -3,6 +3,7 @@ from pathlib import Path
 from python.openai_interface import OpenAIInterface
 import asyncio
 from pyppeteer import launch
+from job_description_interface import JobDescriptionInterface
 
 class ResumeGenerator:
     def __init__(self, resume_path: str, style_path: str, output_dir: Path):
@@ -17,8 +18,19 @@ class ResumeGenerator:
             self.generate_resume_using_gpt(api_key)
         if ai_model == 'gemini':
             self.generate_resume_using_gemini(api_key)
-    
-    def generate_resume_using_gpt(self, api_key):
+
+    def generate_resume_with_job_description(self, ai_model, api_key, job_description=""):
+        logging.info('Generating resume with job description...')
+        # create job description interface
+        job_description_interface = JobDescriptionInterface(job_description)
+        job_description = job_description_interface.get_text_job_description()
+        # switch AI model
+        if ai_model == 'openai':
+            self.generate_resume_using_gpt(api_key, job_description=job_description)
+        if ai_model == 'gemini':
+            self.generate_resume_using_gemini(api_key, job_description=job_description)
+
+    def generate_resume_using_gpt(self, api_key, job_description=""):
         # use open ai api to upload file in the prompt
         client = OpenAIInterface(api_key=api_key)
         # Prompt to create the resume using the yaml file and style file
@@ -30,16 +42,21 @@ class ResumeGenerator:
             style_content = style_file.read()
         # prompt
         prompt_html = f"""
-                Act as an HR expert and create a resume that passes ATS checks using the attached Yaml data.
-                Use the provided CSS for styling. Generate the resume in valid HTML format. Do not include any other text.
+                Act as an HR expert and create a resume that passes ATS checks using the attached Yaml Content.
+                Use the provided CSS Content for styling. Generate the resume in valid HTML format. Do not include any other text.
+                If the job description is provided and not empty, tailor the resume to the job description.
                 return only the html code for the resume. skip the ``` html
 
-                ### JSON Resume Content
+                ### Yaml Resume Content
                 {resume_content}
 
                 ### CSS Style Content
                 {style_content}
+
+                ### Job Description
+                {job_description}
                 """
+
         # Prepare the message for ChatCompletion
         messages = [
             {
