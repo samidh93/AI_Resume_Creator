@@ -11,15 +11,15 @@ class ResumeGenerator:
         self.style_path = style_path
         self.output_dir = output_dir
 
-    def generate_resume(self, ai_model, api_key):
+    def generate_resume(self, ai_model, api_key , language):
         logging.info('Generating resume...')
         # switch AI model
         if ai_model == 'openai':
-            self.generate_resume_using_gpt(api_key)
+            self.generate_resume_using_gpt(api_key, language)
         if ai_model == 'gemini':
-            self.generate_resume_using_gemini(api_key)
+            self.generate_resume_using_gemini(api_key, language)
 
-    def generate_resume_with_job_description(self, ai_model, api_key, job_description=""):
+    def generate_resume_with_job_description(self, ai_model, api_key, job_description="", language=""):
         logging.info('Generating resume with job description...')
         # create job description interface
         job_description_interface = JobDescriptionInterface(job_description)
@@ -27,11 +27,11 @@ class ResumeGenerator:
         logging.info('Job description: %s' % job_description)
         # switch AI model
         if ai_model == 'openai':
-            self.generate_resume_using_gpt(api_key, job_description=job_description)
+            self.generate_resume_using_gpt(api_key, job_description, language)
         if ai_model == 'gemini':
-            self.generate_resume_using_gemini(api_key, job_description=job_description)
+            self.generate_resume_using_gemini(api_key, job_description, language)
 
-    def generate_resume_using_gpt(self, api_key, job_description=""):
+    def generate_resume_using_gpt(self, api_key, job_description="", language=""):
         # use open ai api to upload file in the prompt
         client = OpenAIInterface(api_key=api_key)
         # Prompt to create the resume using the yaml file and style file
@@ -46,7 +46,10 @@ class ResumeGenerator:
                 Act as an HR expert and create a resume that passes ATS checks using the attached Yaml Content.
                 write city, country. place education after experiences. sort the data in all sections by date in descending order.
                 Use the provided CSS Content for styling. Generate the resume in valid HTML format. Do not include any other text.
+                if language is provided and not empty, write the resume in the language.
                 If the job description is provided and not empty, tailor the resume to the job description and highlight relevant skills.
+                If the job description is provided and no language provided, write the resume in same language as the job description.
+                make sure the data are complete and valid and you don't forget any section from the yaml content.
                 return only the html code for the resume. skip the ``` html
 
                 ### Yaml Resume Content
@@ -57,6 +60,9 @@ class ResumeGenerator:
 
                 ### Job Description
                 {job_description}
+
+                ### Language
+                {language}
                 """
         logging.info('Prompt: %s' % prompt_html)
         # Prepare the message for ChatCompletion
@@ -101,5 +107,5 @@ class ResumeGenerator:
 
 
 ########### Gemini AI
-    def generate_resume_using_gemini(self, api_key):
+    def generate_resume_using_gemini(self, api_key, job_description="", language=""):
         pass
