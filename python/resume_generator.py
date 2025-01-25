@@ -96,7 +96,7 @@ class ResumeGenerator:
     async def html_to_pdf(self, html_file):
         resume_file_name = self.resume_path.name.replace(".yaml", ".pdf")
         resume_file_path = self.output_dir / resume_file_name
-        browser = await launch()
+        browser = await launch(headless=True)
         page = await browser.newPage()
         await page.goto(f'file://{html_file}')  # Replace with your file path
         await page.pdf({'path': resume_file_path, 'format': 'A4'})

@@ -1,14 +1,11 @@
 # AI Resume Creator
-
 An intelligent resume generator that tailors your resume based on job descriptions using AI.
 
 ## Prerequisites
-
 - Python 3
 - pip (Python package installer)
 
 ## Getting Started
-
 ## How to Get OpenAI API Key
 1. Go to [OpenAI API Keys](https://platform.openai.com/settings/organization/api-keys).
 2. Log in to your OpenAI account.
@@ -27,16 +24,13 @@ An intelligent resume generator that tailors your resume based on job descriptio
 3. Ensure that the files are correctly formatted as required by the application.
 
 ## Setup Instructions
-
 ### 1. Clone the Repository
-
 ```bash
 git clone https://github.com/samidh93/AI_Resume_Creator.git
 cd AI_Resume_Creator
 ```
 
 ### 2. Create and Activate Virtual Environment
-
 #### On macOS/Linux:
 ```bash
 # Create virtual environment
@@ -56,9 +50,36 @@ python -m venv venv
 ```
 
 ### 3. Install Dependencies
-
 Once your virtual environment is activated, install the required packages:
-
 ```bash
 pip install -r requirements.txt
 ```
+
+### 4. Run the Application
+```bash
+python main.py
+```
+application arguments:
+- --resume : Path to the resume YAML file
+- --style : Path to the CSS style file
+- --output : Output directory for generated files
+- --ai_model : AI model to use (openai or gemini)
+- --api_key : API key for the AI model
+- --url : Job description Url
+- --language : Language for the resume
+
+### 5. Output
+- resume files will be generated in the output directory.
+
+### 6. Run the Application within a container
+```bash
+docker build -t ai-resume-creator-python-image . && docker run --memory=2g --cpus=2 -v /Users/sami/dev/AI_Resume_Creator/output/:/app/output/ -v /Users/sami/dev/AI_Resume_Creator/input/:/app/input/ --name ai-resume-creator-python-container ai-resume-creator-python-image 
+```
+- Debugging in -it Mode: 
+```bash
+docker run -it --entrypoint -v /Users/sami/dev/AI_Resume_Creator/output/:/app/output/ -v /Users/sami/dev/AI_Resume_Creator/input/:/app/input/ /bin/bash ai-resume-creator-python-image
+```
+os.environ['PYPPETEER_DOWNLOAD_DIR'] = '/Users/sami/dev/AI_Resume_Creator'
+executablePath='/usr/bin/chromium',
+headless=True,
+args=['--no-sandbox', '--disable-setuid-sandbox']

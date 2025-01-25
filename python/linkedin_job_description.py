@@ -9,7 +9,7 @@ class LinkedinJobDescription:
         self.job_description_url = job_description_url
 
     async def get_text_job_description_with_pyppeteer(self):
-        browser = await launch(headless=False)
+        browser = await launch(headless=True)
         page = await browser.newPage()
         try:
             await page.goto(self.job_description_url, timeout=60000)  # Increase timeout to 60 seconds
