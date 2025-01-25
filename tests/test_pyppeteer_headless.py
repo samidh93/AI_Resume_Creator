@@ -10,9 +10,13 @@ logging.basicConfig(level=logging.INFO)
 async def test_headless_launch():
     logging.info("Starting headless browser launch...")
     print("Chromium executable path:", chromium_executable())
-
     try:
-        browser = await launch(headless=True)
+        if os.environ.get('CONTAINER'):
+            executablePath="/usr/bin/chromium"
+            args=['--no-sandbox', '--disable-setuid-sandbox']
+            browser = await launch(headless=True,executablePath=executablePath,args=args)
+        else:
+            browser = await launch(headless=True)
         assert browser is not None, "Browser failed to launch in headless mode"
         logging.info("Browser launched successfully.")
     except Exception as e:

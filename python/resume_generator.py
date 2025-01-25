@@ -4,7 +4,7 @@ from .openai_interface import OpenAIInterface
 import asyncio
 from pyppeteer import launch
 from .job_description_interface import JobDescriptionInterface
-
+import os
 class ResumeGenerator:
     def __init__(self, resume_path: str, style_path: str, output_dir: Path):
         self.resume_path = resume_path
@@ -96,7 +96,12 @@ class ResumeGenerator:
     async def html_to_pdf(self, html_file):
         resume_file_name = self.resume_path.name.replace(".yaml", ".pdf")
         resume_file_path = self.output_dir / resume_file_name
-        browser = await launch(headless=True)
+        if os.environ.get('CONTAINER'):
+            executablePath="/usr/bin/chromium"
+            args=['--no-sandbox', '--disable-setuid-sandbox']
+            browser = await launch(headless=True,executablePath=executablePath,args=args)
+        else:
+            browser = await launch(headless=True)
         page = await browser.newPage()
         await page.goto(f'file://{html_file}')  # Replace with your file path
         await page.pdf({'path': resume_file_path, 'format': 'A4'})

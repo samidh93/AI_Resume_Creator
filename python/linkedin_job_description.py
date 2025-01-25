@@ -3,13 +3,18 @@ import requests
 from bs4 import BeautifulSoup
 import asyncio
 from pyppeteer import launch
-
+import os
 class LinkedinJobDescription:
     def __init__(self, job_description_url):
         self.job_description_url = job_description_url
 
     async def get_text_job_description_with_pyppeteer(self):
-        browser = await launch(headless=True)
+        if os.environ.get('CONTAINER'):
+            executablePath="/usr/bin/chromium"
+            args=['--no-sandbox', '--disable-setuid-sandbox']
+            browser = await launch(headless=True,executablePath=executablePath,args=args)
+        else:
+            browser = await launch(headless=True)
         page = await browser.newPage()
         try:
             await page.goto(self.job_description_url, timeout=60000)  # Increase timeout to 60 seconds

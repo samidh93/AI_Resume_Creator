@@ -73,13 +73,8 @@ application arguments:
 
 ### 6. Run the Application within a container
 ```bash
-docker build -t ai-resume-creator-python-image . && docker run --memory=2g --cpus=2 -v /Users/sami/dev/AI_Resume_Creator/output/:/app/output/ -v /Users/sami/dev/AI_Resume_Creator/input/:/app/input/ --name ai-resume-creator-python-container ai-resume-creator-python-image 
+bash run_container.sh
 ```
-- Debugging in -it Mode: 
-```bash
-docker run -it --entrypoint -v /Users/sami/dev/AI_Resume_Creator/output/:/app/output/ -v /Users/sami/dev/AI_Resume_Creator/input/:/app/input/ /bin/bash ai-resume-creator-python-image
-```
-os.environ['PYPPETEER_DOWNLOAD_DIR'] = '/Users/sami/dev/AI_Resume_Creator'
-executablePath='/usr/bin/chromium',
-headless=True,
-args=['--no-sandbox', '--disable-setuid-sandbox']
+## Vs code Extensions
+- code runner extension
+- Docker extension
