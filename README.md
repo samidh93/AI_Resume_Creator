@@ -75,6 +75,16 @@ application arguments:
 ```bash
 bash run_container.sh
 ```
+open the script and choose the options to run the application in a container.
+- --resume : Path to the resume YAML file
+- --style : Path to the CSS style file
+- --output : Output directory for generated files
+- --ai_model : AI model to use (openai or gemini)
+- --api_key : API key for the AI model
+- --url : Job description Url
+- --language : Language for the resume
+
+
 ## Vs code Extensions
 - code runner extension
 - Docker extension

@@ -1,4 +1,22 @@
-# build the docker image
+#!/bin/bash
+
+# Build the Docker image
 docker build -t ai-resume-creator-python-image -f Dockerfile .
-# run the docker container
-docker run --memory=2g --cpus=2 -v $(pwd)/output/:/app/output/ -v $(pwd)/input/:/app/input/ --name ai-resume-creator-python-container ai-resume-creator-python-image
+
+# Run the Docker container
+docker run \
+  -v $(pwd)/output/:/app/output/ \
+  -v $(pwd)/input/:/app/input/ \
+  ai-resume-creator-python-image \
+  --resume /app/input/sami.yaml \
+  --url "https://www.linkedin.com/jobs/view/4114811878/"
+
+# Uncomment and adjust additional options as needed:
+#  --memory=2g --cpus=2 \
+#  --name ai-resume-creator-python-container \
+#  python main.py \
+#  --style "some-style" \
+#  --output "/app/output/output-file.yaml" \
+#  --ai_model "model-name" \
+#  --api_key "your-api-key" \
+#  --language "en"
