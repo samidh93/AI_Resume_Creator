@@ -41,41 +41,45 @@ class ResumeGenerator:
 
         with open(self.style_path, "r") as style_file:
             style_content = style_file.read()
-        # prompt
         prompt_html = f"""
-                Act as an HR expert and create a resume that passes ATS checks using the attached Yaml Content.
-                write city, country. place education after experiences. sort the data in all sections by date in descending order.
-                Use the provided CSS Content for styling. Generate the resume in valid HTML format. Do not include any other text.
-                if language is provided and not empty, write the resume in the language.
-                If the job description is provided and not empty, tailor the resume to the job description and highlight relevant skills.
-                If the job description is provided and no language provided, write the resume in same language as the job description.
-                make sure the data are complete and valid and you don't forget any section from the yaml content.
-                return only the html code for the resume. skip the ``` html
+        Act as an HR expert and generate an ATS-compliant resume in valid HTML format using the attached YAML content. The HTML output must exactly mirror the structure and formatting of the YAML input, preserving all keys, nested key-value pairs, and line breaks (each key-value pair on a new line). Use the provided CSS content for styling.
 
-                ### Yaml Resume Content
-                {resume_content}
+        Instructions:
+        - Include city and country information.
+        - Place the 'education' section after the 'experiences' section.
+        - Sort all sections by date in descending order.
+        - If a language is provided and is not empty, generate the resume in that language.
+        - If a job description is provided and is not empty, tailor the resume to match it and highlight relevant skills.
+        - If a job description is provided but no language is given, use the language of the job description.
+        - Ensure all data from the YAML content is complete and valid.
+        - Output only the HTML code for the resume; do not include any extra text or markdown formatting (skip code fences).
 
-                ### CSS Style Content
-                {style_content}
+        ### YAML Resume Content
+        {resume_content}
 
-                ### Job Description
-                {job_description}
+        ### CSS Style Content
+        {style_content}
 
-                ### Language
-                {language}
-                """
+        ### Job Description
+        {job_description}
+
+        ### Language
+        {language}
+        """
         logging.info('Prompt: %s' % prompt_html)
+
         # Prepare the message for ChatCompletion
         messages = [
             {
                 "role": "system",
-                "content": "You are an expert HR professional skilled in creating ATS-compliant resumes.",
+                "content": "You are an expert HR professional skilled in creating ATS-compliant resumes."
             },
             {
                 "role": "user",
                 "content": prompt_html
             }
         ]
+
         # Send request to OpenAI API
         completion = client.prompt(messages)
         # Extract the HTML from the response
