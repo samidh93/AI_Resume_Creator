@@ -5,7 +5,7 @@ from resume_generator import ResumeGenerator
 from ai_enhancer import AIEnhancer  # Optional
 from job_description_interface import JobDescriptionInterface
 # Load resume
-resume_parser = ResumeParser("/Users/sami/dev/AI_Resume_Creator/input/zayneb.yaml")
+resume_parser = ResumeParser("input/sami.yaml")
 resume_summary = resume_parser.get_resume_summary()
 exp_skills = resume_parser.get_resume_experiences()
 resume_skills = resume_parser.get_resume_skills()
