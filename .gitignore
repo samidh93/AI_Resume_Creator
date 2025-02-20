@@ -79,3 +79,6 @@ input/*.yaml
 input/*.pdf
 input/*.html
 input/*.css
+
+
+.vscode

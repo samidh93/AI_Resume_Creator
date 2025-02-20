@@ -1,7 +1,7 @@
 import argparse
 import logging
 from pathlib import Path
-from python.resume_generator import ResumeGenerator
+from .resume_generator import ResumeGenerator
 import yaml
 
 
@@ -34,7 +34,7 @@ def main():
         log_path = output_dir / 'resume_generation.log'
         setup_logging(log_path)
         logging.info('Starting AI Resume Creator...')
-        style_path = Path(args.style) if args.style else Path('input/style.css')
+        style_path = Path(args.style).resolve() if args.style else Path('input/style.css').resolve()
         resume_path = Path(args.resume) if args.resume else Path('input/resume.yaml')
         # load ai_model and api_key from input/secrets.yaml
         secrets_path = Path('input/secrets.yaml')

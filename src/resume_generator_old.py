@@ -23,7 +23,7 @@ class ResumeGenerator:
         logging.info('Generating resume with job description...')
         # create job description interface
         job_description_interface = JobDescriptionInterface(job_description)
-        job_description = job_description_interface.get_text_job_description()
+        job_description = job_description_interface.get_job_description()
         logging.info('Job description: %s' % job_description)
         # switch AI model
         if ai_model == 'openai':
@@ -32,33 +32,31 @@ class ResumeGenerator:
             self.generate_resume_using_gemini(api_key, job_description, language)
 
     def generate_resume_using_gpt(self, api_key, job_description="", language=""):
-        # use open ai api to upload file in the prompt
         client = OpenAIInterface(api_key=api_key)
-        # Prompt to create the resume using the yaml file and style file
-        # Read the files
+        # Read the resume and style files
         with open(self.resume_path, "r") as resume_file:
             resume_content = resume_file.read()
 
-        with open(self.style_path, "r") as style_file:
-            style_content = style_file.read()
         prompt_html = f"""
-        Act as an HR expert and generate an ATS-compliant resume in valid HTML format using the attached YAML content. The HTML output must exactly mirror the structure and formatting of the YAML input, preserving all keys, nested key-value pairs, and line breaks (each key-value pair on a new line). Use the provided CSS content for styling.
+        Act as an HR expert and generate an ATS-compliant resume in valid HTML format using the YAML content provided below.
+        
+        Follow these strict rules:
+        - **Structure:** Maintain the exact indentation of the YAML.
+        - **Font-size:** Use a hierarchy from top-level keys (largest) to nested keys (smallest).
+        - **Bold top-level keys**, *italicize nested keys*, and apply proper **coloring** using the provided CSS File.
+        - **Preserve all keys and values** exactly as given in the YAML.
+        - **Ensure valid HTML output** without markdown, code fences, or extra text.
+        - **Sort experiences & education sections** in descending order by date.
+        - **If language is provided, translate the resume** into that language.
+        - **If a job description is provided**, optimize the resume for it.
 
-        Instructions:
-        - Include city and country information.
-        - Place the 'education' section after the 'experiences' section.
-        - Sort all sections by date in descending order.
-        - If a language is provided and is not empty, generate the resume in that language.
-        - If a job description is provided and is not empty, tailor the resume to match it and highlight relevant skills.
-        - If a job description is provided but no language is given, use the language of the job description.
-        - Ensure all data from the YAML content is complete and valid.
-        - Output only the HTML code for the resume; do not include any extra text or markdown formatting (skip code fences).
+        Ensure the output is **consistent across multiple calls**.
 
         ### YAML Resume Content
         {resume_content}
 
-        ### CSS Style Content
-        {style_content}
+        ### CSS Style File 
+        {self.style_path}
 
         ### Job Description
         {job_description}
@@ -66,13 +64,13 @@ class ResumeGenerator:
         ### Language
         {language}
         """
+
         logging.info('Prompt: %s' % prompt_html)
 
-        # Prepare the message for ChatCompletion
         messages = [
             {
                 "role": "system",
-                "content": "You are an expert HR professional skilled in creating ATS-compliant resumes."
+                "content": "You are an expert HR professional skilled in creating ATS-compliant resumes. Ensure deterministic formatting."
             },
             {
                 "role": "user",
@@ -80,14 +78,16 @@ class ResumeGenerator:
             }
         ]
 
-        # Send request to OpenAI API
-        completion = client.prompt(messages)
-        # Extract the HTML from the response
+        # Send request to OpenAI API with controlled randomness
+        completion = client.prompt(messages, model="gpt-4o-mini", temperature=0)
+        
         resume_content = completion.choices[0].message.content
         resume_html = self.save_resume_html(resume_content)
-        # get html file full path and pass it to html_to_pdf function
-        absolute_html_path = Path(resume_html).resolve()  # Convert to absolute path
+        
+        # Convert to absolute path and generate PDF
+        absolute_html_path = Path(resume_html).resolve()
         asyncio.get_event_loop().run_until_complete(self.html_to_pdf(absolute_html_path))
+
 
     def save_resume_html(self, resume_content):
         resume_file_name = self.resume_path.name.replace(".yaml", ".html")

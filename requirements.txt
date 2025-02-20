@@ -1,6 +1,19 @@
 pyyaml
-openai
 pyppeteer
 requests
 beautifulsoup4
 pytest
+tiktoken
+Jinja2
+spacy
+yake
+nltk
+scikit-learn
+fuzzywuzzy
+python-Levenshtein  # Required for fuzzywuzzy to work
+openai  # Only needed if using AIEnhancer for GPT optimization
+langdetect
+googletrans
+pyppeteer_stealth
+lxml_html_clean
+requests-html

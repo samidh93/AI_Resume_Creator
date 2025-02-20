@@ -57,7 +57,7 @@ pip install -r requirements.txt
 
 ### 4. Run the Application
 ```bash
-python main.py
+python src/main.py
 ```
 application arguments:
 - --resume : Path to the resume YAML file

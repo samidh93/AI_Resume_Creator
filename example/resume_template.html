@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ personal_information.name }} {{ personal_information.surname }} - Resume</title>
+    <link rel="stylesheet" href="../example/styles.css">
+</head>
+<body>
+    <header>
+        <h1>{{ personal_information.name }} {{ personal_information.surname }}</h1>
+        <p>{{ personal_information.city }}, {{ personal_information.country }}</p>
+        <p>📞 {{ personal_information.phone_prefix }} {{ personal_information.phone }}</p>
+        <p>✉️ <a href="mailto:{{ personal_information.email }}">{{ personal_information.email }}</a></p>
+        <p>💼 <a href="{{ personal_information.linkedin }}" target="_blank">LinkedIn</a> | 🖥️ <a href="{{ personal_information.github }}" target="_blank">GitHub</a></p>
+    </header>
+
+    <section>
+        <h2>Summary</h2>
+        <p>{{ summary }}</p>
+    </section>
+
+    <section>
+        <h2>Experience</h2>
+        {% for exp in experiences %}
+            <h3>{{ exp.position }}</h3>
+            <p><strong>{{ exp.company }}</strong> | {{ exp.employment_period }} | {{ exp.location }}</p>
+            
+            <h4>Key Responsibilities:</h4>
+            <ul>
+                {% for res in exp.key_responsibilities %}
+                    <li>{{ res.description }}</li>
+                {% endfor %}
+            </ul>
+            
+            <h4>Skills Acquired:</h4>
+            <ul>
+                {% for skill in exp.skills_acquired %}
+                    <li>{{ skill }}</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </section>
+    
+    <section>
+        <h2>Education</h2>
+        {% for edu in education %}
+            <p><strong>{{ edu.degree }}</strong> - {{ edu.field_of_study }}</p>
+            <p>{{ edu.university }}, {{ edu.graduation_year }}</p>
+        {% endfor %}
+    </section>
+
+    <section>
+        <h2>Skills</h2>
+        {% for category, skills_list in skills | groupby('category') %}
+            <h3>{{ category }}</h3>
+            <ul>
+                {% for skill in skills_list %}
+                    <li>{{ skill.name }} ({{ skill.level }})</li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    </section>    
+
+    <section>
+        <h2>Languages</h2>
+        <ul>
+            {% for lang in languages %}
+                <li>{{ lang.language }} - {{ lang.proficiency }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section>
+        <h2>Projects</h2>
+        {% for project in projects %}
+            <p><strong>{{ project.name }}</strong> - <a href="{{ project.link }}" target="_blank">View on Github</a></p>
+            <p>{{ project.description }}</p>
+        {% endfor %}
+    </section>
+
+    <section>
+        <h2>Certifications</h2>
+        {% for cert in certifications %}
+            <p><strong>{{ cert.name }}</strong> - {{ cert.issuer }} ({{ cert.date }})</p>
+            <p><a href="{{ cert.url }}" target="_blank">View Certificate</a></p>
+        {% endfor %}
+    </section>
+
+    <section>
+        <h2>Interests</h2>
+        <ul>
+            {% for interest in interests %}
+                <li>{{ interest }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+</body>
+</html>

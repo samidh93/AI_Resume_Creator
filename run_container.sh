@@ -8,8 +8,7 @@ docker run \
   -v $(pwd)/output/:/app/output/ \
   -v $(pwd)/input/:/app/input/ \
   ai-resume-creator-python-image \
-  --resume /app/input/sami.yaml \
-  --url "https://www.linkedin.com/jobs/view/4114811878/"
+  --resume /app/input/zayneb.yaml \
 
 # Uncomment and adjust additional options as needed:
 #  --memory=2g --cpus=2 \
@@ -20,3 +19,8 @@ docker run \
 #  --ai_model "model-name" \
 #  --api_key "your-api-key" \
 #  --language "en"
+#  --url "https://www.linkedin.com/jobs/view/4114811878/"
+
+
+# remove all containers
+docker rm -f $(docker ps -a -q)

@@ -24,8 +24,9 @@ class OpenAIInterface:
                 return file.id
         return None
     
-    def prompt(self, messages):
-        # pass more than one message
+    def prompt(self, messages, model="gpt-4o-mini", temperature=0):
         return self.openai.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=messages)
+            model=model,
+            messages=messages,
+            temperature=temperature  # Ensures consistency
+        )

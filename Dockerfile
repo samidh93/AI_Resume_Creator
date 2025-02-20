@@ -31,21 +31,17 @@ ENV CONTAINER=true
 # Copy the requirements file into the container
 COPY requirements.txt .
 
-# Copy the main application file
-COPY main.py .
-
 # Copy necessary directories and files into the container
-COPY python/ python/
+COPY src/ src/
 
 COPY tests/ tests/
 COPY example/ example/
 COPY README.md .
-COPY javascript/ javascript/
 
 # Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Command to run the application
-ENTRYPOINT ["python", "main.py"]
+ENTRYPOINT ["python", "src/main.py"]
 # test the application
 #ENTRYPOINT ["python", "tests/test_pyppeteer_headless.py"]

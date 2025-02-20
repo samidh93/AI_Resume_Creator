@@ -1,15 +1,15 @@
 # interface to get the correct job description based on url
 import asyncio
-from .linkedin_job_description import LinkedinJobDescription
+from linkedin_job_description import LinkedinJobDescription
 
 class JobDescriptionInterface:
     def __init__(self, job_description_url):
         self.job_description_url = job_description_url
     
-    def get_text_job_description(self):
+    def get_job_description(self):
         # return the coroutine 
         platform = self.detect_the_platform()
-        return asyncio.get_event_loop().run_until_complete(platform.get_text_job_description_with_pyppeteer())
+        return platform.get_job_description()
 
     def detect_the_platform(self):
         if self.job_description_url.startswith("https://www.linkedin.com/jobs"):
@@ -20,4 +20,4 @@ class JobDescriptionInterface:
 if __name__ == '__main__':
     job_url_1 = "https://www.linkedin.com/jobs/view/4117398597"
     job_description_obj = JobDescriptionInterface(job_url_1)
-    print(job_description_obj.get_text_job_description())
+    print(job_description_obj.get_job_description())
