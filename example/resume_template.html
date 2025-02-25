@@ -14,7 +14,7 @@
         <p>{{ personal_information.city }}, {{ personal_information.country }}</p>
         <p>📞 {{ personal_information.phone_prefix }} {{ personal_information.phone }}</p>
         <p>✉️ <a href="mailto:{{ personal_information.email }}">{{ personal_information.email }}</a></p>
-        <p>💼 <a href="{{ personal_information.linkedin }}" target="_blank">LinkedIn</a> | 🖥️ 
+        <p>💼 <a href="{{ personal_information.linkedin }}" target="_blank">LinkedIn</a> | 🖥️
             <a href="{{ personal_information.github }}" target="_blank">GitHub</a>
         </p>
     </header>
@@ -51,9 +51,9 @@
         {% for edu in education %}
         <h3>{{ edu.degree }}</h3>
         <ul>
-            <li>Field of Study: {{ edu.field_of_study }}</li>
-            <li>Institution: {{ edu.university }}</li>
-            <li>Graduation Year: {{ edu.graduation_year }}</li>
+            <li><strong>Field of Study</strong> {{ edu.field_of_study }}</li>
+            <li><strong>Institution</strong> {{ edu.university }}</li>
+            <li><strong>Graduation Year</strong> {{ edu.graduation_year }}</li>
         </ul>
         {% endfor %}
     </section>
@@ -91,6 +91,9 @@
             {% endif %}
             {% if project.link is defined %}
             <li><strong>Link:</strong> <a href="{{ project.link }}" target="_blank">View Project</a></li>
+            {% endif %}
+            {% if project.skills is defined %}
+            <li><strong>Skills:</strong> {{ project.skills | join(', ') }}</li>
             {% endif %}
         </ul>
         {% endfor %}

@@ -1,10 +1,11 @@
 import logging
 from pathlib import Path
+import os
 from .openai_interface import OpenAIInterface
 import asyncio
 from pyppeteer import launch
 from .job_description_interface import JobDescriptionInterface
-import os
+
 class ResumeGenerator:
     def __init__(self, resume_path: str, style_path: str, output_dir: Path):
         self.resume_path = resume_path
