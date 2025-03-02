@@ -6,6 +6,7 @@ class ResumeParser:
     def __init__(self, yaml_file):
         self.yaml_file = yaml_file
         self.data = self._load_yaml()
+        self.text = yaml.dump(self.data, default_flow_style=False)
 
     def _load_yaml(self):
         """Load YAML data from file."""
@@ -45,6 +46,14 @@ class ResumeParser:
     def update_summary(self, new_summary):
         """Update the resume summary."""
         self.data["summary"] = new_summary
+    
+    def update_skills(self, new_skills:list):
+        """Update the resume skills."""
+        # append the skills to the previous skills
+        self.data["skills"] += new_skills
+        #skills = self.data['skills']
+        #flat_list = [skill['name'] for skill in skills]
+        #return ", ".join(flat_list)
 
 if __name__ == "__main__":
     resume_parser = ResumeParser("input/sami_dhiab_resume.yaml")

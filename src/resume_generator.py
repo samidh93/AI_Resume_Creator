@@ -4,6 +4,9 @@ import os
 import asyncio
 from pyppeteer import launch
 from pathlib import Path
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 
 class ResumeGenerator:
     """Generates an HTML resume from a YAML data structure."""
@@ -38,15 +41,17 @@ class ResumeGenerator:
         page = await browser.newPage()
         await page.goto(f'file://{html_file}')  # Replace with your file path
         await page.pdf({'path': resume_file_path, 'format': 'A4'})
+        print(f"PDF resume saved as {resume_file_path}")
         await browser.close()
+
 
     def html_to_pdf(self, html_file):
         absolute_html_path = Path(html_file).resolve()    
-        asyncio.get_event_loop().run_until_complete(self.html_to_pdf_async(absolute_html_path))
+        return asyncio.run(self.html_to_pdf_async(absolute_html_path))
 
 if __name__ == "__main__":
     resume_generator = ResumeGenerator("/Users/sami/dev/AI_Resume_Creator/input/zayneb_dhieb_resume.yaml","/Users/sami/dev/AI_Resume_Creator/output", "example/")
     resume_parser = ResumeParser("input/zayneb_dhieb_resume.yaml")
-    html_file = resume_generator.generate_html(resume_parser.data, output_file="output/zayneb_dhieb_resume.html")
+    html_file = resume_generator.generate_html(resume_parser.data)
     absolute_html_path = Path(html_file).resolve()    
-    asyncio.get_event_loop().run_until_complete(resume_generator.html_to_pdf(absolute_html_path))
+    resume_generator.html_to_pdf(absolute_html_path)

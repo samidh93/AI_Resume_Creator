@@ -18,6 +18,6 @@ class JobDescriptionInterface:
             return None
 
 if __name__ == '__main__':
-    job_url_1 = "https://www.linkedin.com/jobs/view/4117398597"
+    job_url_1 = "https://www.linkedin.com/jobs/view/4121332725"
     job_description_obj = JobDescriptionInterface(job_url_1)
     print(job_description_obj.get_job_description())

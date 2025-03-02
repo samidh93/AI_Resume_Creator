@@ -1,18 +1,85 @@
 # class to fetch the text from a linkedin job description
-import requests
-from bs4 import BeautifulSoup
-import asyncio
-from pyppeteer import launch
 import os
-from pyppeteer_stealth import stealth
-from requests_html import HTMLSession
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
 
 class LinkedinJobDescription:
     def __init__(self, job_description_url):
         self.job_description_url = job_description_url
         self.job_description = None
 
-    def get_job_description(self):
+    def get_job_description_via_selenium(self):
+        options = webdriver.ChromeOptions()
+        
+        if os.environ.get('CONTAINER'):
+            print('Running in a container, using custom Chromium executable path.')
+            options.binary_location = "/usr/bin/chromium"
+            options.add_argument('--no-sandbox')
+            options.add_argument('--disable-setuid-sandbox')
+            options.add_argument('--headless')
+            #options.add_argument('--disable-dev-shm-usage')
+
+        else:
+            print('Running locally, using default browser executable path.')
+            #options.add_argument('--headless')
+
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
+        
+        try:
+            print(f'Fetching job description from: {self.job_description_url}')
+            driver.get(self.job_description_url)
+            
+            print('Page loaded, waiting for job description...')
+            
+            try:
+                dismiss_button = WebDriverWait(driver, 10).until(
+                    EC.visibility_of_element_located((By.XPATH, "//button[@aria-label='Dismiss']"))
+                )
+                driver.execute_script("arguments[0].scrollIntoView();", dismiss_button)
+                WebDriverWait(driver, 2).until(EC.element_to_be_clickable(dismiss_button)).click()
+                print('Closed modal popup.')
+            except Exception:
+                print('No dismiss button found.')
+                
+            # Click 'Show More' button if exists
+            try:
+                show_more_button = WebDriverWait(driver, 5).until(
+                    EC.element_to_be_clickable((By.CLASS_NAME, 'show-more-less-html__button--more'))
+                )
+                show_more_button.click()
+                print('Expanded full job description.')
+            except Exception:
+                print('No "Show More" button found.')
+                raise
+            # Extract job description text
+            try:
+                job_description_element = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.CLASS_NAME, 'show-more-less-html__markup'))
+                )
+                job_description = job_description_element.text.strip()
+            except Exception:
+                job_description = None
+                print('No job description found.')
+                raise
+            self.job_description = job_description if job_description else None
+        
+        except Exception as e:
+            print('An error occurred:', e)
+            return 'Error fetching job description.'
+        finally:
+            driver.quit()
+            print('Browser closed.')
+            return self.job_description
+
+
+    def get_job_description_old(self):
+        import requests
+        from requests_html import HTMLSession
         session = HTMLSession()
         response = session.get(self.job_description_url)
         response.html.render(sleep=2)  # Renders the page, similar to a headless browser
@@ -23,6 +90,9 @@ class LinkedinJobDescription:
             return None
 
     async def get_job_description_via_pyppeteer(self):
+        import asyncio
+        from pyppeteer import launch
+        from pyppeteer_stealth import stealth
         if os.environ.get('CONTAINER'):
             print('Running in a container, using custom Chromium executable path.')
             executablePath = "/usr/bin/chromium"
@@ -69,10 +139,14 @@ class LinkedinJobDescription:
             print('An error occurred:', e)
             return 'Error fetching job description.'
         finally:
-            await browser.close()
+            #await browser.close()
             print('Browser closed.')
             return self.job_description
 
+    def get_job_description(self):
+        import asyncio
+
+        return asyncio.get_event_loop().run_until_complete(self.get_job_description_via_pyppeteer())
 
     # only when logged in
     async def get_job_requirements(self, page):
@@ -109,10 +183,9 @@ class LinkedinJobDescription:
 if __name__ == '__main__':
     # Example usage: create object and call get_job_description method
     job_url_1 = "https://www.linkedin.com/jobs/view/4121332725"
-    job_url_2 = "https://www.linkedin.com/jobs/view/4114811878"
-    job_url_3 = "https://www.linkedin.com/jobs/view/4105397342"
-    extract_job_description = LinkedinJobDescription(job_url_1)
-    extract_job_description.get_job_description_no_browser()
+    job_url_2 = "https://www.linkedin.com/jobs/view/4138467155"
+    extract_job_description = LinkedinJobDescription(job_url_2)
+    print(extract_job_description.get_job_description())
     #loop = asyncio.get_event_loop()
     #extracted = loop.run_until_complete(extract_job_description.get_job_description())
     #print(extracted)

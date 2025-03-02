@@ -8,7 +8,7 @@ docker run \
   -v $(pwd)/output/:/app/output/ \
   -v $(pwd)/input/:/app/input/ \
   ai-resume-creator-python-image \
-  --resume /app/input/zayneb.yaml \
+  --resume /app/input/sami_dhiab_resume.yaml \
 
 # Uncomment and adjust additional options as needed:
 #  --memory=2g --cpus=2 \
