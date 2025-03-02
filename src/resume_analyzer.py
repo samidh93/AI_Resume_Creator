@@ -5,7 +5,8 @@ from pathlib import Path
 from pydantic import BaseModel
 from resume_parser import ResumeParser
 from job_description_interface import JobDescriptionInterface
-
+from resume_parser import ResumeParser
+import re
 class ATSResult(BaseModel):
     ats_score: int
     matched_skills: list[str]
@@ -13,13 +14,15 @@ class ATSResult(BaseModel):
     suggested_improvements: str
 
 class ResumeAnalyzer:
-    def __init__(self, api_key):
+    def __init__(self, api_key, job_description:str, resume:ResumeParser):
         openai.api_key = api_key
         self.matched_skills = []
         self.missing_skills = []
         self.suggested_improvements = ""
+        self.job_description_text = re.sub(r'\s+', ' ', job_description).strip()
+        self.resume_text = resume.get_required_fields_for_ats()
 
-    def compare(self, job_description, resume_content) -> ATSResult:
+    def compare(self) -> ATSResult:
         """Calculate the ATS score for the resume based on the job description."""
         prompt = f"""
                 You are an Applicant Tracking System (ATS) that evaluates resumes based on job descriptions.
@@ -35,13 +38,14 @@ class ResumeAnalyzer:
                 ###
 
                 Job Description:
-                {job_description}
+                {self.job_description_text}
                 
                 Resume:
-                {resume_content}
+                {self.resume_text}
                 
                 Return only the JSON output without any explanation.
                 """
+        print(prompt)
         response = openai.chat.completions.create(
             model="gpt-4o-mini",
             response_format={"type": "json_object"},
@@ -63,8 +67,8 @@ if __name__ == "__main__":
     job_url_1 = "https://www.linkedin.com/jobs/view/4114686525"
     job_description_obj = JobDescriptionInterface(job_url_1)
     job_desc = job_description_obj.get_job_description(load_from_file=True, save_to_file=True)
-    ra = ResumeAnalyzer(api_key=api_key)
-    ats_result = ra.compare(job_desc, resume.text)
+    ra = ResumeAnalyzer(api_key, job_desc, resume)
+    ats_result = ra.compare()
     print(f"ATS Score: {ats_result.ats_score}")
     print(f"Matched Skills: {ats_result.matched_skills}")
     print(f"Missing Skills: {ats_result.missing_skills}")

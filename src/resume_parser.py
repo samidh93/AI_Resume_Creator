@@ -21,6 +21,12 @@ class ResumeParser:
         """Combine sections into plain text for ATS analysis."""
         return f"{self.data['summary']} " 
 
+    def get_resume_languages(self):
+        """Combine sections into plain text for ATS analysis."""
+        languages = self.data['languages']
+        flat_list = [lang['language'] for lang in languages]    
+        return ", ".join(flat_list)
+    
     def get_resume_experiences_skills_acquired(self):
         """Combine sections into plain text for ATS analysis."""
         skills_aqc= [exp["skills_acquired"] for exp in self.data["experiences"]]
@@ -46,7 +52,25 @@ class ResumeParser:
         """Combine sections into plain text for ATS analysis."""
         interests = self.data['interests']
         return ", ".join(interests)
-    
+
+    def get_required_fields_for_ats(self):
+        """Combine sections into plain text for ATS analysis."""
+        return "\n".join((
+            "summary: ",
+            self.get_resume_summary(),
+            "experiences skills_acquired: ",
+            self.get_resume_experiences_skills_acquired(),
+            "skills: ",
+            self.get_resume_skills(),
+            "languages: ",
+            self.get_resume_languages(),
+            "side project skills: ",
+            self.get_resume_project_skills(),
+            "interests: ",
+            self.get_resume_interests()
+        ))
+
+
     def update_summary(self, new_summary):
         """Update the resume summary."""
         self.data["summary"] = new_summary
