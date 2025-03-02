@@ -1,13 +1,7 @@
 pyyaml
 pytest
 tiktoken
-Jinja2
-spacy
-yake
-nltk
-scikit-learn
-fuzzywuzzy
-python-Levenshtein  # Required for fuzzywuzzy to work
+pydantic
 openai  # Only needed if using AIEnhancer for GPT optimization
 langdetect
 googletrans

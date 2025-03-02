@@ -6,12 +6,16 @@ class ResumeParser:
     def __init__(self, yaml_file):
         self.yaml_file = yaml_file
         self.data = self._load_yaml()
-        self.text = yaml.dump(self.data, default_flow_style=False)
+        self.text = self._load_plain_text()
 
     def _load_yaml(self):
         """Load YAML data from file."""
         with open(self.yaml_file, "r") as file:
             return yaml.safe_load(file)
+    def _load_plain_text(self):
+        """Load plain text data from file."""
+        with open(self.yaml_file, "r") as file:
+            return file.read()
 
     def get_resume_summary(self):
         """Combine sections into plain text for ATS analysis."""

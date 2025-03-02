@@ -1,0 +1,55 @@
+SALESFORCE B2B COMMERCE CLOUD DEVELOPER | SF CORE CLOUD DEVELOPER (m/w/d)
+
+Deutschlandweit, Hybrid bzw. Remote
+
+Vollzeit oder Teilzeit | unbefristete Festanstellung
+
+
+
+
+Standorte
+
+Berlin, Köln, Düsseldorf, Essen, Paderborn, Münster, Bonn, Hamburg, Stuttgart, Dortmund, Hannover, Frankfurt, Nürnberg, Potsdam, Leipzig, München, Dresden, Jena, ...
+
+
+
+
+DEINE AUFGABEN:
+
+Design, Entwicklung und Ausrollen von Lösungen mit Salesforce Commerce auf der Salesforce Core-Plattform mit Lightning Experience
+Dabei verstehst du die individuellen Prozesse und Anforderungen unserer Kundschaft und begleitest sie während des gesamten Softwareentwicklungszyklus
+Erstellung des E-Commerce-Frontend samt UI-Komponenten und Business-Logik
+Integration von Third-Party-Lösungen (bspw. Payment, Analytics oder Marketing Automation) und Unternehmenssoftware (bspw. ERP, PIM, WMS, OMS oder CMS)
+Bewertung der Skalierbarkeit und Performance der Lösungen in Bezug auf kritische Datenmengen, Optimierung von Algorithmen, Plattform-Limitierungen, etc.
+Stetige Weiterentwicklung deiner Fähigkeiten mit der Möglichkeit sich entweder auf die technische Projektleitung zu spezialisieren oder eine ausgewiesene Expertise in der Softwarearchitektur aufzubauen
+
+
+
+
+DEIN PROFIL:
+
+Hochschulstudium im Bereich der Informatik, Wirtschaftsinformatik, Ingenieur- oder Naturwissenschaften oder vergleichbare Qualifikation
+Umfangreiche Erfahrung in der Entwicklung mit webbasierten Technologien (JavaScript, AJAX, HTML), objektorientierten Programmiersprachen (Apex oder Java) und Frameworks (Lightning, Aura oder NodeJS)
+Vorzugsweise verfügst du über gute Kenntnisse im Umgang mit Salesforce B2B Commerce auf Lightning Experience und B2B2C Commerce, mit Web Services (REST/SOAP/GraphQL) und Entwicklungsumgebungen wie z.B. IntelliJ, Eclipse, VS Code oder Ähnliches
+Idealerweise verfügst du bereits über relevante Zertifikate und Akkreditierungen wie bspw. Salesforce Administrator, B2B Commerce Administrator, B2B Commerce Developer oder Experience Cloud Consultant etc.
+Anwendungsfokussierte und kundenorientierte Arbeitsmentalität sowie ausgeprägte Teamorientierung und Kommunikationsfähigkeiten
+Sehr gute Deutsch- sowie gute Englischkenntnisse runden Dein Profil ab
+
+
+
+
+BENEFITS:
+
+Welcome Days
+Weiterbildung & Salesforce Events ( Zertifizierungen, Training, ...)
+Team Events
+Sportförderung
+Hemden -und Blusenreinigung
+Prämien für zusätzliches Engagement
+Auszeit Programm
+Mobiles Arbeiten, Gleitzeit, ...
+
+
+
+
+Bewerbungen an s.saracbasi@tech-ohana.com
