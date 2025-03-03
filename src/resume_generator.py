@@ -72,8 +72,8 @@ class ResumeGenerator:
             for exp in resume_data["experiences"]:
                 if "position" in exp:
                     exp["position"] = await self._translate_text(exp["position"], self.language)
-                if "company" in exp:
-                    exp["company"] = await self._translate_text(exp["company"], self.language)
+#                if "company" in exp:
+#                    exp["company"] = await self._translate_text(exp["company"], self.language)
                 if "employment_period" in exp:
                     exp["employment_period"] = await self._translate_text(exp["employment_period"], self.language)
                 if "location" in exp:
@@ -91,15 +91,15 @@ class ResumeGenerator:
                     edu["degree"] = await self._translate_text(edu["degree"], self.language)
                 if "field_of_study" in edu:
                     edu["field_of_study"] = await self._translate_text(edu["field_of_study"], self.language)
-                if "university" in edu:
-                    edu["university"] = await self._translate_text(edu["university"], self.language)
+                #if "university" in edu:
+                #    edu["university"] = await self._translate_text(edu["university"], self.language)
                 if "graduation_year" in edu:
                     edu["graduation_year"] = await self._translate_text(edu["graduation_year"], self.language)
 
         if "projects" in resume_data:
             for project in resume_data["projects"]:
-                if "name" in project:
-                    project["name"] = await self._translate_text(project["name"], self.language)
+                #if "name" in project:
+                #    project["name"] = await self._translate_text(project["name"], self.language)
                 if "role" in project:
                     project["role"] = await self._translate_text(project["role"], self.language)
                 if "description" in project:
@@ -158,11 +158,11 @@ class ResumeGenerator:
 
 if __name__ == "__main__":
     resume_generator = ResumeGenerator(
-        "/Users/sami/dev/AI_Resume_Creator/input/zayneb_dhieb_resume.yaml",
+        "/Users/sami/dev/AI_Resume_Creator/input/sami_dhiab_resume.yaml",
         "/Users/sami/dev/AI_Resume_Creator/output",
         "example/",
         language="fr"  # Change this to your desired target language code (e.g. "fr", "es", etc.)
     )
-    resume_parser = ResumeParser("input/zayneb_dhieb_resume.yaml")
+    resume_parser = ResumeParser("input/sami_dhiab_resume.yaml")
     html_file = resume_generator.generate_html(resume_parser.data)
     resume_generator.html_to_pdf(html_file)
