@@ -50,7 +50,6 @@ def main():
             resume_enhancer = ResumeEnhancer(api_key, resume_path, company_name) 
             resume_path = resume_enhancer.enhance_resume(ats_result)
             resume_parser = ResumeParser(resume_path)
-     
         # Generate resume
         resume_generator = ResumeGenerator(resume_path, output_dir, "example/")
         resume_html = resume_generator.generate_html(resume_parser.data)

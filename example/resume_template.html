@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ labels.lang or 'en' }}">
 
 <head>
     <meta charset="UTF-8">
@@ -20,24 +20,24 @@
     </header>
 
     <section>
-        <h2>Summary</h2>
+        <h2>{{ labels.summary }}</h2>
         <p>{{ summary }}</p>
     </section>
 
     <section>
-        <h2>Experience</h2>
+        <h2>{{ labels.experience }}</h2>
         {% for exp in experiences %}
         <h3>{{ exp.position }}</h3>
         <p><strong>{{ exp.company }}</strong> | {{ exp.employment_period }} | {{ exp.location }}</p>
 
-        <h4>Key Responsibilities:</h4>
+        <h4>{{ labels.key_responsibilities }}</h4>
         <ul>
             {% for res in exp.key_responsibilities %}
             <li>{{ res.description }}</li>
             {% endfor %}
         </ul>
 
-        <h4>Skills Acquired:</h4>
+        <h4>{{ labels.skills_acquired }}</h4>
         <ul>
             {% for skill in exp.skills_acquired %}
             <li>{{ skill }}</li>
@@ -47,19 +47,19 @@
     </section>
 
     <section>
-        <h2>Education</h2>
+        <h2>{{ labels.education }}</h2>
         {% for edu in education %}
         <h3>{{ edu.degree }}</h3>
         <ul>
-            <li><strong>Field of Study</strong> {{ edu.field_of_study }}</li>
-            <li><strong>Institution</strong> {{ edu.university }}</li>
-            <li><strong>Graduation Year</strong> {{ edu.graduation_year }}</li>
+            <li><strong>{{ labels.field_of_study }}:</strong> {{ edu.field_of_study }}</li>
+            <li><strong>{{ labels.institution }}:</strong> {{ edu.university }}</li>
+            <li><strong>{{ labels.graduation_year }}:</strong> {{ edu.graduation_year }}</li>
         </ul>
         {% endfor %}
     </section>
 
     <section>
-        <h2>Skills</h2>
+        <h2>{{ labels.skills }}</h2>
         {% for category, skills_list in skills | groupby('category') %}
         <h3>{{ category }}</h3>
         <ul>
@@ -71,7 +71,7 @@
     </section>
 
     <section>
-        <h2>Languages</h2>
+        <h2>{{ labels.languages }}</h2>
         <ul>
             {% for lang in languages %}
             <li>{{ lang.language }} - {{ lang.proficiency }}</li>
@@ -80,43 +80,43 @@
     </section>
 
     <section>
-        <h2>Projects</h2>
+        <h2>{{ labels.projects }}</h2>
         {% for project in projects %}
         <h3>{{ project.name }}</h3>
         <ul>
-            <li><strong>Role:</strong> {{ project.role }}</li>
-            <li><strong>Description:</strong> {{ project.description }}</li>
+            <li><strong>{{ labels.role }}:</strong> {{ project.role }}</li>
+            <li><strong>{{ labels.description }}:</strong> {{ project.description }}</li>
             {% if project.year is defined %}
-            <li><strong>Year:</strong> {{ project.year }}</li>
+            <li><strong>{{ labels.year }}:</strong> {{ project.year }}</li>
             {% endif %}
             {% if project.link is defined %}
-            <li><strong>Link:</strong> <a href="{{ project.link }}" target="_blank">View Project</a></li>
+            <li><strong>{{ labels.link }}:</strong> <a href="{{ project.link }}" target="_blank">{{ labels.view_project }}</a></li>
             {% endif %}
             {% if project.skills is defined %}
-            <li><strong>Skills:</strong> {{ project.skills | join(', ') }}</li>
+            <li><strong>{{ labels.skills }}:</strong> {{ project.skills | join(', ') }}</li>
             {% endif %}
         </ul>
         {% endfor %}
     </section>
 
     <section>
-        <h2>Certifications</h2>
+        <h2>{{ labels.certifications }}</h2>
         {% for cert in certifications %}
         <h3>{{ cert.name }}</h3>
         <ul>
-            <li><strong>Issuer:</strong> {{ cert.issuer }}</li>
+            <li><strong>{{ labels.issuer }}:</strong> {{ cert.issuer }}</li>
             {% if cert.date is defined %}
-            <li><strong>Date of Issuance:</strong> {{ cert.date }}</li>
+            <li><strong>{{ labels.date_of_issuance }}:</strong> {{ cert.date }}</li>
             {% endif %}
             {% if cert.url is defined %}
-            <li><strong>Certificate:</strong> <a href="{{ cert.url }}" target="_blank">View</a></li>
+            <li><strong>{{ labels.certificate }}:</strong> <a href="{{ cert.url }}" target="_blank">{{ labels.view }}</a></li>
             {% endif %}
         </ul>
         {% endfor %}
     </section>
 
     <section>
-        <h2>Interests</h2>
+        <h2>{{ labels.interests }}</h2>
         <ul>
             {% for interest in interests %}
             <li>{{ interest }}</li>
