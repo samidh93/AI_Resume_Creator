@@ -5,13 +5,14 @@ import openai
 import yaml
 import json
 class ResumeEnhancer:
-    def __init__(self, api_key, resume_path: str):
+    def __init__(self, api_key, resume_path: str, company_name: str):
         openai.api_key = api_key
         self.resume_path = Path(resume_path)
         self.yaml = YAML()
         self.yaml.preserve_quotes = True
         self.yaml.indent(mapping=2, sequence=4, offset=2)
         self.resume_data = self._load_resume()
+        self.company_name = company_name
     
     def _load_resume(self) -> dict:
         """Loads the YAML resume file while preserving order."""
@@ -20,7 +21,7 @@ class ResumeEnhancer:
     
     def _save_resume(self) -> str:
         """Saves the enhanced resume to a new YAML file with '_ai' suffix."""
-        new_resume_path = self.resume_path.with_stem(self.resume_path.stem + "_ai")
+        new_resume_path = self.resume_path.with_stem(self.resume_path.stem + "_" + self.company_name)
         with open(new_resume_path, 'w') as file:
             self.yaml.dump(self.resume_data, file)
         return str(new_resume_path)

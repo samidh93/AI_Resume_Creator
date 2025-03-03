@@ -44,10 +44,10 @@ def main():
         resume_parser = ResumeParser(resume_path)
         # load job description
         if args.url:
-            job_description = JobDescriptionInterface(args.url).get_job_description(load_from_file=True, save_to_file=True)
+            job_description, company_name = JobDescriptionInterface(args.url).get_job_description(load_from_file=True, save_to_file=True)
             ra = ResumeAnalyzer(api_key, job_description, resume_parser)
             ats_result = ra.compare()
-            resume_enhancer = ResumeEnhancer(api_key, resume_path) 
+            resume_enhancer = ResumeEnhancer(api_key, resume_path, company_name) 
             resume_path = resume_enhancer.enhance_resume(ats_result)
             resume_parser = ResumeParser(resume_path)
      

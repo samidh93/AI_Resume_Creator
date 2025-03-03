@@ -2,6 +2,7 @@ pyyaml
 pytest
 tiktoken
 pydantic
-openai  # Only needed if using AIEnhancer for GPT optimization
+openai 
 langdetect
 googletrans
+ruamel.yaml
