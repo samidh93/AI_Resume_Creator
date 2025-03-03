@@ -6,3 +6,5 @@ openai
 langdetect
 googletrans
 ruamel.yaml
+jinja2
+pyppeteer

@@ -1,7 +1,6 @@
 import os
 import asyncio
 from pyppeteer import launch
-from pyppeteer_stealth import stealth
 
 class LinkedinJobDescription:
     def __init__(self, job_description_url):
@@ -18,7 +17,6 @@ class LinkedinJobDescription:
             print('Launching Chromium...')
             browser = await launch(headless=False, args=['--no-sandbox', '--disable-setuid-sandbox'])
             page = await browser.newPage()
-            await stealth(page)
 
             print(f'Fetching job description from: {self.job_description_url}')
             await page.goto(self.job_description_url, {'waitUntil': 'domcontentloaded'})

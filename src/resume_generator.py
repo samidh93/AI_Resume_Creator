@@ -4,9 +4,6 @@ import os
 import asyncio
 from pyppeteer import launch
 from pathlib import Path
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from webdriver_manager.chrome import ChromeDriverManager
 
 class ResumeGenerator:
     """Generates an HTML resume from a YAML data structure."""
