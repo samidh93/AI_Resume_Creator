@@ -165,6 +165,4 @@ if __name__ == "__main__":
     )
     resume_parser = ResumeParser("input/zayneb_dhieb_resume.yaml")
     html_file = resume_generator.generate_html(resume_parser.data)
-    # Uncomment the following lines if you wish to generate a PDF as well:
-    # absolute_html_path = Path(html_file).resolve()
     resume_generator.html_to_pdf(html_file)

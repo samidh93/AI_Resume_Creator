@@ -7,7 +7,7 @@ from resume_enhancer import ResumeEnhancer
 from job_description_interface import JobDescriptionInterface
 from resume_analyzer import ResumeAnalyzer
 import yaml
-
+from langdetect import detect
 def setup_logging(log_path: Path):
     logging.basicConfig(
         level=logging.INFO,
@@ -42,7 +42,7 @@ def main():
         ai_model = secrets['ai_model']
         # Load resume
         resume_parser = ResumeParser(resume_path)
-        # load job description
+        # load job description        
         if args.url:
             job_description, company_name = JobDescriptionInterface(args.url).get_job_description(load_from_file=True, save_to_file=True)
             ra = ResumeAnalyzer(api_key, job_description, resume_parser)
@@ -51,7 +51,10 @@ def main():
             resume_path = resume_enhancer.enhance_resume(ats_result)
             resume_parser = ResumeParser(resume_path)
         # Generate resume
-        resume_generator = ResumeGenerator(resume_path, output_dir, "example/")
+        resume_lang = args.language 
+        if resume_lang == 'auto':
+            resume_lang = detect(job_description)
+        resume_generator = ResumeGenerator(resume_path, output_dir, "example/", resume_lang)
         resume_html = resume_generator.generate_html(resume_parser.data)
         resume_generator.html_to_pdf(resume_html)
         logging.info('Resume generated successfully!')
