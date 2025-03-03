@@ -42,6 +42,7 @@ def main():
         ai_model = secrets['ai_model']
         # Load resume
         resume_parser = ResumeParser(resume_path)
+        resume_lang = args.language 
         # load job description        
         if args.url:
             job_description, company_name = JobDescriptionInterface(args.url).get_job_description(load_from_file=True, save_to_file=True)
@@ -50,10 +51,9 @@ def main():
             resume_enhancer = ResumeEnhancer(api_key, resume_path, company_name) 
             resume_path = resume_enhancer.enhance_resume(ats_result)
             resume_parser = ResumeParser(resume_path)
+            if resume_lang == 'auto':
+                resume_lang = detect(job_description)
         # Generate resume
-        resume_lang = args.language 
-        if resume_lang == 'auto':
-            resume_lang = detect(job_description)
         resume_generator = ResumeGenerator(resume_path, output_dir, "example/", resume_lang)
         resume_html = resume_generator.generate_html(resume_parser.data)
         resume_generator.html_to_pdf(resume_html)
