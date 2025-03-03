@@ -79,6 +79,6 @@ input/*.yaml
 input/*.pdf
 input/*.html
 input/*.css
-
+output/jobs
 
 .vscode

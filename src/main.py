@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from resume_parser import ResumeParser
 from resume_generator import ResumeGenerator
-from src.resume_enhancer import ResumeEnhancer 
+from resume_enhancer import ResumeEnhancer 
 from job_description_interface import JobDescriptionInterface
 from resume_analyzer import ResumeAnalyzer
 import yaml
@@ -45,13 +45,11 @@ def main():
         # load job description
         if args.url:
             job_description = JobDescriptionInterface(args.url).get_job_description(load_from_file=True, save_to_file=True)
-            ra = ResumeAnalyzer(api_key)
-            ats_result = ra.compare(job_description, resume_parser.text)
-            print(f"ATS Score: {ats_result.ats_score}")
-            print(f"Matched Skills: {ats_result.matched_skills}")
-            print(f"Missing Skills: {ats_result.missing_skills}")
-            print(f"Suggested Improvements: {ats_result.suggested_improvements}")
-            ai = ResumeEnhancer(api_key)  # Replace with actual API key
+            ra = ResumeAnalyzer(api_key, job_description, resume_parser)
+            ats_result = ra.compare()
+            resume_enhancer = ResumeEnhancer(api_key, resume_path) 
+            resume_path = resume_enhancer.enhance_resume(ats_result)
+            resume_parser = ResumeParser(resume_path)
      
         # Generate resume
         resume_generator = ResumeGenerator(resume_path, output_dir, "example/")
