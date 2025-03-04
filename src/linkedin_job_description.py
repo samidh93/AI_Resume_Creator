@@ -14,8 +14,18 @@ class LinkedinJobDescription:
     async def get_job_description_via_pyppeteer(self):
         browser = None
         try:
-            print('Launching Chromium...')
-            browser = await launch(headless=False, args=['--no-sandbox', '--disable-setuid-sandbox'])
+            headless = os.getenv('CONTAINER', 'false').lower() == 'true'
+            args = ['--no-sandbox', '--disable-setuid-sandbox']
+
+            if headless:
+                args.append('--headless')
+                executable_path = '/usr/bin/chromium'
+            else:
+                executable_path = None
+
+            print(f'Launching Chromium... Headless: {headless}')
+            browser = await launch(headless=headless, args=args, executablePath=executable_path)
+
             page = await browser.newPage()
 
             print(f'Fetching job description from: {self.job_description_url}')
