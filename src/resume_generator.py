@@ -34,6 +34,7 @@ class ResumeGenerator:
         """Render resume data with dynamically translated labels and content."""
         # Define all static label keys with their default English texts.
         label_keys = {
+            "personal_information": "Personal Information",
             "summary": "Summary",
             "experience": "Experience",
             "education": "Education",
@@ -65,6 +66,10 @@ class ResumeGenerator:
             labels[key] = await self._translate_text(value, self.language)
 
         # Translate resume content fields as needed.
+        if "personal_information" in resume_data:
+            if "citizenship" in resume_data["personal_information"]:
+                resume_data["personal_information"]["citizenship"] = await self._translate_text(resume_data["personal_information"]["citizenship"], self.language)
+        
         if "summary" in resume_data:
             resume_data["summary"] = await self._translate_text(resume_data["summary"], self.language)
 
@@ -168,7 +173,7 @@ if __name__ == "__main__":
         "/Users/sami/dev/AI_Resume_Creator/input/sami_dhiab_resume.yaml",
         "/Users/sami/dev/AI_Resume_Creator/output",
         "example/",
-        language="en"  # Change this to your desired target language code (e.g. "fr", "es", etc.)
+        language="de"  # Change this to your desired target language code (e.g. "fr", "es", etc.)
     )
     resume_parser = ResumeParser("input/sami_dhiab_resume.yaml")
     html_file = resume_generator.generate_html(resume_parser.data)
