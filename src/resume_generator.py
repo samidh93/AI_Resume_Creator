@@ -168,7 +168,7 @@ if __name__ == "__main__":
         "/Users/sami/dev/AI_Resume_Creator/input/sami_dhiab_resume.yaml",
         "/Users/sami/dev/AI_Resume_Creator/output",
         "example/",
-        language="fr"  # Change this to your desired target language code (e.g. "fr", "es", etc.)
+        language="en"  # Change this to your desired target language code (e.g. "fr", "es", etc.)
     )
     resume_parser = ResumeParser("input/sami_dhiab_resume.yaml")
     html_file = resume_generator.generate_html(resume_parser.data)
