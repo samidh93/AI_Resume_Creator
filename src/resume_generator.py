@@ -148,7 +148,14 @@ class ResumeGenerator:
             browser = await launch(headless=True)
         page = await browser.newPage()
         await page.goto(f'file://{html_file}')
-        await page.pdf({'path': resume_file_path, 'format': 'A4'})
+        #await page.pdf({'path': resume_file_path, 'format': 'A4'})
+        await page.pdf({
+            "path": 'resume.pdf',
+            "format": 'A4',
+            "printBackground": True,
+            "preferCSSPageSize": True,
+            "embedFonts": True # Ensure fonts are embedded
+        })
         print(f"PDF resume saved as {resume_file_path}")
         await browser.close()
 
