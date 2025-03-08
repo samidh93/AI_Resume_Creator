@@ -155,7 +155,7 @@ class ResumeGenerator:
         await page.goto(f'file://{html_file}')
         #await page.pdf({'path': resume_file_path, 'format': 'A4'})
         await page.pdf({
-            "path": 'resume.pdf',
+            "path": resume_file_path,
             "format": 'A4',
             "printBackground": True,
             "preferCSSPageSize": True,
