@@ -2,16 +2,20 @@
 import asyncio
 from linkedin_job_description import LinkedinJobDescription
 import os
+from pathlib import Path
+
 class JobDescriptionInterface:
     def __init__(self, job_description_url):
         self.job_description_url = job_description_url
         self.job_id = None
         self.job_description = None
 
-    def get_job_description(self, load_from_file=False, save_to_file=False, job_dir="output/jobs"):
+    def get_job_description(self, load_from_file=False, save_to_file=False, job_dir="../output/jobs"):
         # return the coroutine 
         platform = self.detect_the_platform()
-        job_file = f"{job_dir}/{self.job_id}.txt"
+        # full path to the job dir
+        job_dir = Path(__file__).parent / job_dir
+        job_file = Path(f"{job_dir}/{self.job_id}.txt")
         if load_from_file:
             try:
                 # check if job_file exists

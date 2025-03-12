@@ -168,13 +168,18 @@ class ResumeGenerator:
         absolute_html_path = Path(html_file).resolve()
         return asyncio.run(self.html_to_pdf_async(absolute_html_path))
 
+
 if __name__ == "__main__":
+
+    resume = Path(__file__).parent.parent / "input" / "sami_dhiab_resume_Amoria Bond.yaml"
+    output = Path(__file__).parent.parent / "output" 
+    example = Path(__file__).parent.parent / "example"
     resume_generator = ResumeGenerator(
-        "/Users/sami/dev/AI_Resume_Creator/input/sami_dhiab_resume.yaml",
-        "/Users/sami/dev/AI_Resume_Creator/output",
-        "example/",
+        resume_path=resume, 
+        output_dir=output,
+        template_path=example,
         language="de"  # Change this to your desired target language code (e.g. "fr", "es", etc.)
     )
-    resume_parser = ResumeParser("input/sami_dhiab_resume.yaml")
+    resume_parser = ResumeParser(resume)
     html_file = resume_generator.generate_html(resume_parser.data)
     resume_generator.html_to_pdf(html_file)

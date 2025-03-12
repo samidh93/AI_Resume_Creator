@@ -7,6 +7,7 @@ WORKDIR /app
 # Install necessary Chromium dependencies
 RUN apt-get update && apt-get install -y \
     chromium \
+    fonts-noto-color-emoji \
     nano \
     libnss3 \
     libatk-bridge2.0-0 \

@@ -54,7 +54,8 @@ def main():
             if resume_lang == 'auto':
                 resume_lang = detect(job_description)
         # Generate resume
-        resume_generator = ResumeGenerator(resume_path, output_dir, "example/", resume_lang)
+        example_dir = Path(__file__).parent.parent / "example"
+        resume_generator = ResumeGenerator(resume_path, output_dir, example_dir, resume_lang)
         resume_html = resume_generator.generate_html(resume_parser.data)
         resume_generator.html_to_pdf(resume_html)
         logging.info('Resume generated successfully!')
