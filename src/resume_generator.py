@@ -171,14 +171,14 @@ class ResumeGenerator:
 
 if __name__ == "__main__":
 
-    resume = Path(__file__).parent.parent / "input" / "sami_dhiab_resume_Amoria Bond.yaml"
+    resume = Path(__file__).parent.parent / "input" / "sami_dhiab_resume.yaml"
     output = Path(__file__).parent.parent / "output" 
     example = Path(__file__).parent.parent / "example"
     resume_generator = ResumeGenerator(
         resume_path=resume, 
         output_dir=output,
         template_path=example,
-        language="de"  # Change this to your desired target language code (e.g. "fr", "es", etc.)
+        language="en"  # Change this to your desired target language code (e.g. "fr", "es", etc.)
     )
     resume_parser = ResumeParser(resume)
     html_file = resume_generator.generate_html(resume_parser.data)
