@@ -75,8 +75,8 @@ class ResumeGenerator:
 
         if "experiences" in resume_data:
             for exp in resume_data["experiences"]:
-                if "position" in exp:
-                    exp["position"] = await self._translate_text(exp["position"], self.language)
+                #if "position" in exp:
+                #    exp["position"] = await self._translate_text(exp["position"], self.language)
 #                if "company" in exp:
 #                    exp["company"] = await self._translate_text(exp["company"], self.language)
                 if "employment_period" in exp:
@@ -92,8 +92,8 @@ class ResumeGenerator:
 
         if "education" in resume_data:
             for edu in resume_data["education"]:
-                if "degree" in edu:
-                    edu["degree"] = await self._translate_text(edu["degree"], self.language)
+                #if "degree" in edu:
+                #    edu["degree"] = await self._translate_text(edu["degree"], self.language)
                 if "field_of_study" in edu:
                     edu["field_of_study"] = await self._translate_text(edu["field_of_study"], self.language)
                 #if "university" in edu:
@@ -113,10 +113,10 @@ class ResumeGenerator:
 
         if "certifications" in resume_data:
             for cert in resume_data["certifications"]:
-                if "name" in cert:
-                    cert["name"] = await self._translate_text(cert["name"], self.language)
-                if "issuer" in cert:
-                    cert["issuer"] = await self._translate_text(cert["issuer"], self.language)
+                #if "name" in cert:
+                #    cert["name"] = await self._translate_text(cert["name"], self.language)
+                #if "issuer" in cert:
+                #    cert["issuer"] = await self._translate_text(cert["issuer"], self.language)
                 if "date" in cert:
                     cert["date"] = await self._translate_text(cert["date"], self.language)
                 # URLs remain unchanged.
