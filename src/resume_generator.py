@@ -178,7 +178,7 @@ if __name__ == "__main__":
         resume_path=resume, 
         output_dir=output,
         template_path=example,
-        language="en"  # Change this to your desired target language code (e.g. "fr", "es", etc.)
+        language="de"  # Change this to your desired target language code (e.g. "fr", "es", etc.)
     )
     resume_parser = ResumeParser(resume)
     html_file = resume_generator.generate_html(resume_parser.data)
