@@ -6,6 +6,7 @@ from resume_generator import ResumeGenerator
 from resume_enhancer import ResumeEnhancer 
 from job_description_interface import JobDescriptionInterface
 from resume_analyzer import ResumeAnalyzer
+from job_description_file import JobDescriptionFile
 import yaml
 from langdetect import detect
 def setup_logging(log_path: Path):
@@ -22,8 +23,9 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='AI Resume Creator')
     parser.add_argument('--resume', type=str, default=None, help='Path to the resume YAML file')
     parser.add_argument('--output', type=str, default='output/', help='Output directory for generated files')
-    parser.add_argument('--url', type=str, default=None, help='Job description Url')
+    parser.add_argument('--job_description_url', type=str, default=None, help='Job description Url')
     parser.add_argument('--language', type=str, default='auto', help='Language for the resume ')
+    parser.add_argument('--job_description_file', type=str, default=None, help='Path to the job description file')
     return parser.parse_args()
 
 def main():
@@ -44,8 +46,11 @@ def main():
         resume_parser = ResumeParser(resume_path)
         resume_lang = args.language 
         # load job description        
-        if args.url:
-            job_description, company_name = JobDescriptionInterface(args.url).get_job_description(load_from_file=True, save_to_file=True)
+        if args.job_description_url or args.job_description_file:
+            if args.job_description_file:
+                job_description, company_name = JobDescriptionFile(args.job_description_file).get_job_description_from_file()
+            else:   
+                job_description, company_name = JobDescriptionInterface(args.job_description_url).get_job_description(load_from_file=True, save_to_file=True)
             ra = ResumeAnalyzer(api_key, job_description, resume_parser)
             ats_result = ra.compare()
             resume_enhancer = ResumeEnhancer(api_key, resume_path, company_name) 

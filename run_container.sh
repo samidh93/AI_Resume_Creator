@@ -9,7 +9,7 @@ docker run \
   -v $(pwd)/input/:/app/input/ \
   ai-resume-creator-python-image \
   --resume /app/input/sami_dhiab_resume.yaml \
-  --url "https://www.linkedin.com/jobs/view/4175141028"
+  --job_description_url "https://www.linkedin.com/jobs/view/4175141028"
 
 # docker run -it \
 #  --entrypoint /bin/bash \
@@ -24,7 +24,7 @@ docker run \
 #  python main.py \
 #  --output "/app/output/output-file.yaml" \
 #  --language "en"
-#  --url "https://www.linkedin.com/jobs/view/4114811878/"
+#  --job_description_url "https://www.linkedin.com/jobs/view/4114811878/"
 
 
 # remove all containers
