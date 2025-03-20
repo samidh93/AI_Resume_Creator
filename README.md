@@ -62,7 +62,7 @@ python src/main.py
 application arguments:
 - --resume : Path to the resume YAML file
 - --output : Output directory for generated files
-- --url : Job description Url
+- --job_description_url : Job description Url
 - --language : Language for the resume
 
 ### 5. Output
@@ -75,7 +75,7 @@ bash run_container.sh
 open the script and choose the options to run the application in a container.
 - --resume : Path to the resume YAML file
 - --output : Output directory for generated files
-- --url : Job description Url
+- --job_description_url : Job description Url
 - --language : Language for the resume
 
 
