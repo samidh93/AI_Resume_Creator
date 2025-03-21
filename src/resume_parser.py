@@ -44,9 +44,13 @@ class ResumeParser:
     def get_resume_project_skills(self):
         """Combine sections into plain text for ATS analysis."""
         projects = self.data['projects']
-        skills_list = [proj['skills'] for proj in projects]
-        flat_list = [skill for sublist in skills_list for skill in sublist]
-        return ", ".join(flat_list)
+        try:
+            skills_list = [proj['skills'] for proj in projects]
+            flat_list = [skill for sublist in skills_list for skill in sublist]
+            return ", ".join(flat_list)
+        
+        except KeyError:
+            return ""
 
     def get_resume_interests(self):
         """Combine sections into plain text for ATS analysis."""
