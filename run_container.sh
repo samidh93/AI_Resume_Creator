@@ -5,13 +5,14 @@
 
 # Run the Docker container
 docker run \
+  -p 11434:11434 \
   -v $(pwd)/output/:/app/output/ \
   -v $(pwd)/input/:/app/input/ \
   ai-resume-creator-python-image \
   --resume /app/input/sami_dhiab_resume.yaml \
   --job_description_url "https://www.linkedin.com/jobs/view/4175141028"
-
 # docker run -it \
+#   -p 11434:11434 \
 #  --entrypoint /bin/bash \
 #  -v $(pwd)/output/:/app/output/ \
 #  -v $(pwd)/input/:/app/input/ \

@@ -1,7 +1,7 @@
 from typing import Dict, Optional, Union, List, Any
 from langchain.schema import HumanMessage
 from langchain.schema.output import LLMResult
-
+import os
 # Import only the necessary Ollama model class
 from langchain_ollama import OllamaLLM
 
@@ -20,8 +20,14 @@ class AIInterface:
 
         if model_provider.lower() == 'ollama':
             # Initialize Ollama with only the basic parameters
+            ollama_url = None
+            if os.environ.get('CONTAINER'):
+                ollama_url = "http://host.docker.internal:11434"
+            else:
+                ollama_url = "http://localhost:11434"
             self.model = OllamaLLM(
                 model=model_name, 
+                url=ollama_url,
                 **kwargs
             )
         else:
