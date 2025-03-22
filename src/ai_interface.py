@@ -21,13 +21,13 @@ class AIInterface:
         if model_provider.lower() == 'ollama':
             # Initialize Ollama with only the basic parameters
             ollama_url = None
-            if os.environ.get('CONTAINER'):
+            if os.getenv('CONTAINER', 'false').lower() == 'true':
                 ollama_url = "http://host.docker.internal:11434"
             else:
                 ollama_url = "http://localhost:11434"
             self.model = OllamaLLM(
                 model=model_name, 
-                url=ollama_url,
+                base_url=ollama_url,
                 **kwargs
             )
         else:
