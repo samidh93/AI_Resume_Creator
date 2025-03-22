@@ -23,39 +23,30 @@ class ResumeParser:
 
     def get_resume_languages(self):
         """Combine sections into plain text for ATS analysis."""
-        languages = self.data['languages']
-        flat_list = [lang['language'] for lang in languages]    
-        return ", ".join(flat_list)
+        return f"{self.data['languages']}"  
+
     
     def get_resume_experiences_skills_acquired(self):
         """Combine sections into plain text for ATS analysis."""
         skills_aqc= [exp["skills_acquired"] for exp in self.data["experiences"]]
-        # Flatten the list
-        flat_list = [skill for sublist in skills_aqc for skill in sublist]
-        # Join into a single string
-        return ", ".join(flat_list)
+        return f"{[skill for sublist in skills_aqc for skill in sublist]}"
+
 
     def get_resume_skills(self):
         """Combine sections into plain text for ATS analysis."""
-        skills = self.data['skills']
-        flat_list = [skill['name'] for skill in skills]
-        return ", ".join(flat_list)
+        return f"{self.data['skills']}"
 
     def get_resume_project_skills(self):
         """Combine sections into plain text for ATS analysis."""
         projects = self.data['projects']
         try:
-            skills_list = [proj['skills'] for proj in projects]
-            flat_list = [skill for sublist in skills_list for skill in sublist]
-            return ", ".join(flat_list)
-        
+            return f"{[proj['skills'] for proj in projects]}"
         except KeyError:
             return ""
 
     def get_resume_interests(self):
         """Combine sections into plain text for ATS analysis."""
-        interests = self.data['interests']
-        return ", ".join(interests)
+        return f"{self.data['interests']}"
 
     def get_required_fields_for_ats(self):
         """Combine sections into plain text for ATS analysis."""
