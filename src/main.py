@@ -40,8 +40,8 @@ def main():
         # load ai_model and api_key from input/secrets.yaml
         secrets_path = Path('input/secrets.yaml')
         secrets = yaml.safe_load(open(secrets_path, 'r'))
-        api_key = secrets['api_key']
-        ai_model = secrets['ai_model']
+        #api_key = secrets['api_key']
+        #ai_model = secrets['ai_model']
         # Load resume
         resume_parser = ResumeParser(resume_path)
         resume_lang = args.language 
@@ -51,9 +51,9 @@ def main():
                 job_description, company_name = JobDescriptionFile(args.job_description_file).get_job_description_from_file()
             else:   
                 job_description, company_name = JobDescriptionInterface(args.job_description_url).get_job_description(load_from_file=True, save_to_file=True)
-            ra = ResumeAnalyzer(api_key, job_description, resume_parser)
+            ra = ResumeAnalyzer( job_description, resume_parser)
             ats_result = ra.compare()
-            resume_enhancer = ResumeEnhancer(api_key, resume_path, company_name) 
+            resume_enhancer = ResumeEnhancer(resume_path, company_name) 
             resume_path = resume_enhancer.enhance_resume(ats_result)
             resume_parser = ResumeParser(resume_path)
             if resume_lang == 'auto':

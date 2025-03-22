@@ -8,3 +8,10 @@ googletrans
 ruamel.yaml
 jinja2
 pyppeteer
+langchain 
+langchain-openai
+langchain-google-genai
+langchain-community
+openai
+google-generativeai
+langchain-ollama

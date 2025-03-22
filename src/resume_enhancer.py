@@ -4,9 +4,19 @@ from resume_analyzer import ATSResult
 import openai
 import yaml
 import json
+from ai_interface import AIInterface
+
 class ResumeEnhancer:
-    def __init__(self, api_key, resume_path: str, company_name: str):
-        openai.api_key = api_key
+    def __init__(self, resume_path: str, company_name: str):
+        #openai.api_key = api_key
+        # Create the AI interface
+        self.model = AIInterface(
+                model_provider="ollama",
+                model_name="qwen2.5:3b",
+                temperature=0,
+                #max_tokens=100,
+                format="json"
+            )
         self.resume_path = Path(resume_path)
         self.yaml = YAML()
         self.yaml.preserve_quotes = True
@@ -47,17 +57,18 @@ class ResumeEnhancer:
                 Key is summary and value is the updated summary.
                 """
         print(prompt)
-        response = openai.chat.completions.create(
-            model="gpt-4o-mini",
-            response_format={"type": "json_object"},
-            temperature=0,  # Ensures consistent results
-            messages=[
+        messages=[
                 {"role": "system", "content": "You are an expert that evaluates resumes for ATS compatibility."},
                 {"role": "user", "content": prompt}
             ]
-        )
-
-        response = response.choices[0].message.content
+        #response = openai.chat.completions.create(
+        #    model="gpt-4o-mini",
+        #    response_format={"type": "json_object"},
+        #    temperature=0,  # Ensures consistent results
+        #    messages=messages
+        #)
+        #response = response.choices[0].message.content
+        response = self.model.get_completion(messages)
         self.resume_data["summary"] = json.loads(response)["summary"]
 
     def _add_missing_skills(self, missing_skills: list[str]):
@@ -74,8 +85,8 @@ class ResumeEnhancer:
 
 if __name__ == "__main__":
     secrets_path = Path('input/secrets.yaml')
-    secrets = yaml.safe_load(open(secrets_path, 'r'))
-    api_key = secrets['api_key']
+    #secrets = yaml.safe_load(open(secrets_path, 'r'))
+    #api_key = secrets['api_key']
     resume_path = "input/sami_dhiab_resume.yaml"
     ats_result = ATSResult(
             ats_score=65
@@ -83,6 +94,6 @@ if __name__ == "__main__":
             ,suggested_improvements="1. Include specific experience with C# and .Net, as these are critical for the role. 2. Highlight any experience with Angular and Azure DevOps, as these are mentioned in the job description. 3. Emphasize leadership experience and any direct involvement in SaaS product development. 4. Ensure that the resume is formatted clearly with distinct sections for skills, experience, and education to improve readability for ATS."
             )
     
-    enhancer = ResumeEnhancer(api_key, resume_path)
+    enhancer = ResumeEnhancer(resume_path, "Google")
     new_resume_path = enhancer.enhance_resume(ats_result)
     print(f"Resume successfully enhanced and saved at: {new_resume_path}")
