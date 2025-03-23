@@ -12,11 +12,17 @@
     <header>
         <h1>{{ personal_information.name }} {{ personal_information.surname }}</h1>
         <p>🏠 {{ personal_information.city }}, {{ personal_information.country }}</p>
-        <p>📘 {{ personal_information.citizenship }}</p>
+        <p> 
+            {% if personal_information.citizenship is defined %}
+            📘 {{ personal_information.citizenship }}
+            {% endif %}
+        </p>
         <p>📞 {{ personal_information.phone_prefix }} {{ personal_information.phone }}</p>
         <p>✉️ <a href="mailto:{{ personal_information.email }}">{{ personal_information.email }}</a></p>
         <p>💼 <a href="{{ personal_information.linkedin }}" target="_blank">LinkedIn</a> | 🖥️
+            {% if personal_information.github is defined %}
             <a href="{{ personal_information.github }}" target="_blank">GitHub</a>
+            {% endif %}
         </p>
     </header>
 
