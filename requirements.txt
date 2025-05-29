@@ -15,3 +15,5 @@ langchain-community
 openai
 google-generativeai
 langchain-ollama
+flask
+flask-cors
