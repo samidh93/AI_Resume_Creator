@@ -7,57 +7,72 @@ from flask import Flask, request, jsonify, send_file
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from langdetect import detect
-
+import uuid
+import json
 # Import the modules from main.py
 from resume_parser import ResumeParser
 from resume_generator import ResumeGenerator
 from resume_enhancer import ResumeEnhancer 
-from job_description_interface import JobDescriptionInterface
 from resume_analyzer import ResumeAnalyzer
-from job_description_file import JobDescriptionFile
+from job_data import JobData
+# Set up logger for this module
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 CORS(app)
 
-# Configure upload settings
-UPLOAD_FOLDER = 'temp_uploads'
+# Configure upload settings - use input directory for uploaded resumes
+project_root = Path(__file__).parent.parent
+INPUT_FOLDER = project_root / 'input'
 ALLOWED_EXTENSIONS = {'yaml', 'yml', 'txt'}
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['INPUT_FOLDER'] = str(INPUT_FOLDER)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
 
-# Ensure upload directory exists
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+logger.info(f"Server configuration:")
+logger.info(f"  - Project root: {project_root}")
+logger.info(f"  - Input folder: {INPUT_FOLDER}")
+logger.info(f"  - Allowed extensions: {ALLOWED_EXTENSIONS}")
+logger.info(f"  - Max file size: {app.config['MAX_CONTENT_LENGTH']} bytes")
 
-def setup_logging():
-    """Setup logging for the Flask app"""
+# Ensure required directories exist
+try:
+    INPUT_FOLDER.mkdir(exist_ok=True)
+    (project_root / 'input' / 'company_resume').mkdir(exist_ok=True)
+    (project_root / 'output' / 'generated_resume').mkdir(exist_ok=True)
+    logger.info("Required directories created/verified successfully")
+except Exception as e:
+    logger.error(f"Failed to create required directories: {e}")
+    raise
+
+def setup_logging(log_path: Path):
     logging.basicConfig(
         level=logging.INFO,
-        format='%(asctime)s - %(levelname)s - %(message)s',
+        format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
         handlers=[
+            logging.FileHandler(log_path),
             logging.StreamHandler()
         ]
     )
+    logger.info(f"Logging configured - log file: {log_path}")
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
-    return '.' in filename and \
+    logger.debug(f"Checking if file is allowed: {filename}")
+    is_allowed = '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def load_secrets():
-    """Load secrets from input/secrets.yaml"""
-    try:
-        secrets_path = Path('input/secrets.yaml')
-        if secrets_path.exists():
-            return yaml.safe_load(open(secrets_path, 'r'))
-        return {}
-    except Exception as e:
-        logging.warning(f"Could not load secrets: {e}")
-        return {}
+    logger.debug(f"File {filename} allowed: {is_allowed}")
+    return is_allowed
 
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
-    return jsonify({"status": "healthy", "message": "AI Resume Creator API is running"})
+    logger.info("Health check endpoint accessed")
+    client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'Unknown'))
+    logger.debug(f"Health check request from IP: {client_ip}")
+    
+    response = {"status": "healthy", "message": "AI Resume Creator API is running"}
+    logger.info("Health check completed successfully")
+    return jsonify(response)
 
 @app.route('/generate-resume', methods=['POST'])
 def generate_resume():
@@ -65,216 +80,231 @@ def generate_resume():
     Generate a resume based on uploaded resume file and job description
     Expects:
     - resume_file: YAML resume file
-    - job_description_url: URL to job description (optional)
-    - job_description_text: Direct job description text (optional)
+    - job_data: JSON string with format: {"job_id": "123", "job_title": "Software Engineer", "job_description": "...", "company_name": "Company"} (optional)
     - language: Language for resume (optional, defaults to 'auto')
     """
+    request_id = str(uuid.uuid4())[:8]  # Short request ID for tracking
+    client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'Unknown'))
+    
+    logger.info(f"[{request_id}] Resume generation request started from IP: {client_ip}")
+    
+    # Log request details
+    logger.debug(f"[{request_id}] Request details:")
+    logger.debug(f"[{request_id}]   - Content type: {request.content_type}")
+    logger.debug(f"[{request_id}]   - Content length: {request.content_length}")
+    logger.debug(f"[{request_id}]   - Form data keys: {list(request.form.keys())}")
+    logger.debug(f"[{request_id}]   - Files: {list(request.files.keys())}")
+    
+    resume_path = None
+    
     try:
         # Check if resume file is provided
+        logger.debug(f"[{request_id}] Validating resume file upload")
         if 'resume_file' not in request.files:
+            logger.warning(f"[{request_id}] No resume file provided in request")
             return jsonify({"error": "No resume file provided"}), 400
         
         resume_file = request.files['resume_file']
         if resume_file.filename == '':
+            logger.warning(f"[{request_id}] Empty filename provided")
             return jsonify({"error": "No resume file selected"}), 400
         
+        logger.info(f"[{request_id}] Resume file received: {resume_file.filename}")
+        
         if not allowed_file(resume_file.filename):
+            logger.warning(f"[{request_id}] Invalid file type: {resume_file.filename}")
             return jsonify({"error": "Invalid file type. Only YAML files are allowed"}), 400
         
-        # Save uploaded resume file
+        logger.debug(f"[{request_id}] Saving uploaded resume file")
         filename = secure_filename(resume_file.filename)
-        resume_path = Path(app.config['UPLOAD_FOLDER']) / filename
-        resume_file.save(resume_path)
+        # Check if original filename exists and create backup if needed
+        resume_path = Path(app.config['INPUT_FOLDER']) / filename
+        try:
+            resume_file.save(resume_path)
+            logger.info(f"[{request_id}] Resume file saved successfully: {resume_path}")
+        except Exception as e:
+            logger.error(f"[{request_id}] Failed to save resume file: {e}")
+            return jsonify({"error": f"Failed to save resume file: {str(e)}"}), 500
         
-        # Get other parameters
-        job_description_url = request.form.get('job_description_url')
-        job_description_text = request.form.get('job_description_text')
+        # Get job data
+        job_data = request.form.get('job_data')
         language = request.form.get('language', 'auto')
         
-        # Create output directory
-        output_dir = Path('output')
+        logger.info(f"[{request_id}] Request parameters:")
+        logger.info(f"[{request_id}]   - Job data: {job_data}")
+        logger.info(f"[{request_id}]   - Language: {language}")
+        
+        # Parse job data from JSON string
+        try:
+            if job_data and job_data.strip():  # Check if job_data exists and is not empty
+                job_data_dict = json.loads(job_data)
+                logger.debug(f"[{request_id}] Job data parsed successfully: {job_data_dict}")
+                
+                # Validate required fields for JobData
+                required_fields = ['job_id', 'job_title', 'job_description', 'company_name']
+                missing_fields = [field for field in required_fields if field not in job_data_dict]
+                
+                if missing_fields:
+                    logger.error(f"[{request_id}] Missing required job data fields: {missing_fields}")
+                    return jsonify({"error": f"Missing required job data fields: {missing_fields}"}), 400
+            else:
+                job_data_dict = {}
+                logger.warning(f"[{request_id}] No job data provided or empty")
+                
+        except json.JSONDecodeError as e:
+            logger.error(f"[{request_id}] Failed to parse job data JSON: {e}")
+            return jsonify({"error": f"Invalid job data format: {str(e)}"}), 400
+        except Exception as e:
+            logger.error(f"[{request_id}] Error processing job data: {e}")
+            return jsonify({"error": f"Error processing job data: {str(e)}"}), 400
+        
+        # Create output directory - use generated_resume subdirectory
+        logger.debug(f"[{request_id}] Setting up output directory")
+        project_root = Path(__file__).parent.parent
+        output_dir = project_root / 'output' / 'generated_resume'
         output_dir.mkdir(exist_ok=True)
+        logger.debug(f"[{request_id}] Output directory ready: {output_dir}")
         
-        # Setup logging
-        log_path = output_dir / 'resume_generation.log'
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler(log_path),
-                logging.StreamHandler()
-            ]
-        )
-        
-        logging.info('Starting AI Resume Creator via API...')
-        
-        # Load secrets
-        secrets = load_secrets()
+        logger.info(f'[{request_id}] Starting AI Resume Creator processing...')
         
         # Load resume
-        resume_parser = ResumeParser(resume_path)
+        logger.info(f"[{request_id}] Loading and parsing resume")
+        try:
+            resume_parser = ResumeParser(resume_path)
+            logger.info(f"[{request_id}] Resume parsed successfully")
+        except Exception as e:
+            logger.error(f"[{request_id}] Failed to parse resume: {e}")
+            return jsonify({"error": f"Failed to parse resume: {str(e)}"}), 500
+        
         resume_lang = language
-        
         # Process job description if provided
-        job_description = None
-        company_name = "Unknown Company"
-        
-        if job_description_text:
-            job_description = job_description_text
-            company_name = "Provided Company"
-        elif job_description_url:
-            job_description, company_name = JobDescriptionInterface(job_description_url).get_job_description(load_from_file=True, save_to_file=True)
+        if job_data_dict:
+            job_data_object = JobData(**job_data_dict)
+            job_id, job_title, job_description, company_name = job_data_object.get_job_data()
+        else:
+            # No job data provided - use default values
+            job_id = None
+            job_title = None
+            job_description = None
+            company_name = "Unknown Company"
+            logger.info(f"[{request_id}] No job data provided - proceeding with basic resume generation")
         
         # If job description is provided, enhance the resume
         if job_description:
-            ra = ResumeAnalyzer(job_description, resume_parser)
-            ats_result = ra.compare()
-            resume_enhancer = ResumeEnhancer(resume_path, company_name)
-            enhanced_resume_path = resume_enhancer.enhance_resume(ats_result)
-            resume_parser = ResumeParser(enhanced_resume_path)
+            logger.info(f"[{request_id}] Starting resume enhancement process")
+            try:
+                logger.debug(f"[{request_id}] Running ATS analysis")
+                ra = ResumeAnalyzer(job_description, resume_parser)
+                ats_result = ra.compare()
+                logger.info(f"[{request_id}] ATS analysis completed - Score: {ats_result.ats_score}")
+                
+                logger.debug(f"[{request_id}] Enhancing resume based on ATS results")
+                resume_enhancer = ResumeEnhancer(resume_path, company_name, job_title)
+                enhanced_resume_path = resume_enhancer.enhance_resume(ats_result)
+                logger.info(f"[{request_id}] Resume enhanced successfully: {enhanced_resume_path}")
+                
+                # Use enhanced resume for generation
+                resume_parser = ResumeParser(enhanced_resume_path)
+                
+                if resume_lang == 'auto':
+                    logger.debug(f"[{request_id}] Auto-detecting language from job description")
+                    resume_lang = detect(job_description)
+                    logger.info(f"[{request_id}] Language detected: {resume_lang}")
+                    
+            except Exception as e:
+                logger.error(f"[{request_id}] Resume enhancement failed: {e}")
+                return jsonify({"error": f"Resume enhancement failed: {str(e)}"}), 500
+        
+        # Generate resume using synchronous methods
+        logger.info(f"[{request_id}] Starting resume generation")
+        try:
+            example_dir = Path(__file__).parent.parent / "example"
+            logger.debug(f"[{request_id}] Using template directory: {example_dir}")
             
-            if resume_lang == 'auto':
-                resume_lang = detect(job_description)
+            actual_resume_path = enhanced_resume_path if job_description else resume_path
+            resume_generator = ResumeGenerator(actual_resume_path, output_dir, example_dir, resume_lang)            
+            # Generate HTML and PDF using synchronous methods with proper event loop handling
+            logger.info(f"[{request_id}] Generating HTML resume")
+            resume_html = resume_generator.generate_html(resume_parser.data)
+            
+            logger.info(f"[{request_id}] Converting HTML to PDF")
+            pdf_path = resume_generator.html_to_pdf(resume_html)
+            
+            logger.info(f'[{request_id}] Resume generated successfully: {pdf_path}')
+            
+        except Exception as e:
+            logger.error(f"[{request_id}] Resume generation failed: {e}")
+            return jsonify({"error": f"Resume generation failed: {str(e)}"}), 500
         
-        # Generate resume
-        example_dir = Path(__file__).parent.parent / "example"
-        resume_generator = ResumeGenerator(resume_path, output_dir, example_dir, resume_lang)
-        resume_html = resume_generator.generate_html(resume_parser.data)
-        pdf_path = resume_generator.html_to_pdf(resume_html)
-        
-        # Clean up uploaded file
-        os.remove(resume_path)
-        
-        logging.info('Resume generated successfully via API!')
-        
-        return jsonify({
+        # Prepare response
+        response_data = {
             "status": "success",
             "message": "Resume generated successfully",
             "pdf_path": str(pdf_path),
             "company_name": company_name,
             "language": resume_lang
-        })
+        }
+        
+        logger.info(f'[{request_id}] Resume generation completed successfully!')
+        logger.info(f'[{request_id}] Response: {response_data}')
+        
+        # Optional: Clean up uploaded file after successful processing
+        # Uncomment the following lines if you want to remove uploaded files after processing
+        # try:
+        #     if resume_path and resume_path.exists():
+        #         resume_path.unlink()
+        #         logger.info(f"[{request_id}] Cleaned up uploaded file: {resume_path}")
+        # except Exception as e:
+        #     logger.warning(f"[{request_id}] Failed to clean up uploaded file: {e}")
+        
+        return jsonify(response_data)
         
     except Exception as e:
-        logging.error(f'An error occurred: {e}')
-        # Clean up uploaded file if it exists
-        if 'resume_path' in locals() and resume_path.exists():
-            os.remove(resume_path)
+        logger.error(f'[{request_id}] Unexpected error occurred: {e}', exc_info=True)
         return jsonify({"error": str(e)}), 500
 
-@app.route('/download-resume/<filename>', methods=['GET'])
-def download_resume(filename):
-    """Download generated resume PDF"""
-    try:
-        output_dir = Path('output')
-        file_path = output_dir / filename
-        
-        if not file_path.exists():
-            return jsonify({"error": "File not found"}), 404
-        
-        return send_file(file_path, as_attachment=True, download_name=filename)
-        
-    except Exception as e:
-        logging.error(f'Error downloading file: {e}')
-        return jsonify({"error": str(e)}), 500
+# Add request logging middleware
+@app.before_request
+def log_request_info():
+    """Log incoming request details"""
+    client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'Unknown'))
+    logger.debug(f"Incoming request: {request.method} {request.path} from {client_ip}")
 
-@app.route('/analyze-resume', methods=['POST'])
-def analyze_resume():
-    """
-    Analyze resume against job description without generating a new resume
-    Expects:
-    - resume_file: YAML resume file
-    - job_description_url: URL to job description (optional)
-    - job_description_text: Direct job description text (optional)
-    """
-    try:
-        # Check if resume file is provided
-        if 'resume_file' not in request.files:
-            return jsonify({"error": "No resume file provided"}), 400
-        
-        resume_file = request.files['resume_file']
-        if resume_file.filename == '':
-            return jsonify({"error": "No resume file selected"}), 400
-        
-        if not allowed_file(resume_file.filename):
-            return jsonify({"error": "Invalid file type. Only YAML files are allowed"}), 400
-        
-        # Save uploaded resume file
-        filename = secure_filename(resume_file.filename)
-        resume_path = Path(app.config['UPLOAD_FOLDER']) / filename
-        resume_file.save(resume_path)
-        
-        # Get job description
-        job_description_url = request.form.get('job_description_url')
-        job_description_text = request.form.get('job_description_text')
-        
-        if not job_description_text and not job_description_url:
-            os.remove(resume_path)
-            return jsonify({"error": "Job description is required for analysis"}), 400
-        
-        # Load resume
-        resume_parser = ResumeParser(resume_path)
-        
-        # Get job description
-        if job_description_text:
-            job_description = job_description_text
-            company_name = "Provided Company"
-        else:
-            job_description, company_name = JobDescriptionInterface(job_description_url).get_job_description(load_from_file=True, save_to_file=True)
-        
-        # Analyze resume
-        ra = ResumeAnalyzer(job_description, resume_parser)
-        ats_result = ra.compare()
-        
-        # Clean up uploaded file
-        os.remove(resume_path)
-        
-        return jsonify({
-            "status": "success",
-            "message": "Resume analysis completed",
-            "analysis_result": ats_result.model_dump(),
-            "company_name": company_name
-        })
-        
-    except Exception as e:
-        logging.error(f'An error occurred during analysis: {e}')
-        # Clean up uploaded file if it exists
-        if 'resume_path' in locals() and resume_path.exists():
-            os.remove(resume_path)
-        return jsonify({"error": str(e)}), 500
-
-@app.route('/job-description', methods=['POST'])
-def get_job_description():
-    """
-    Extract job description from URL
-    Expects:
-    - job_url: URL to job description
-    """
-    try:
-        data = request.get_json()
-        if not data or 'job_url' not in data:
-            return jsonify({"error": "Job URL is required"}), 400
-        
-        job_url = data['job_url']
-        job_description, company_name = JobDescriptionInterface(job_url).get_job_description(load_from_file=True, save_to_file=True)
-        
-        return jsonify({
-            "status": "success",
-            "job_description": job_description,
-            "company_name": company_name
-        })
-        
-    except Exception as e:
-        logging.error(f'Error extracting job description: {e}')
-        return jsonify({"error": str(e)}), 500
+@app.after_request
+def log_response_info(response):
+    """Log response details"""
+    client_ip = request.environ.get('HTTP_X_FORWARDED_FOR', request.environ.get('REMOTE_ADDR', 'Unknown'))
+    logger.debug(f"Response: {response.status_code} for {request.method} {request.path} to {client_ip}")
+    return response
 
 if __name__ == '__main__':
-    setup_logging()
-    logging.info("Starting AI Resume Creator Flask Server...")
+    logger.info("Initializing AI Resume Creator Flask Server...")
+    
+    project_root = Path(__file__).parent.parent
+    output_dir = project_root / 'output'
+    output_dir.mkdir(exist_ok=True)
+    log_path = output_dir / 'resume_generation.log'
+    
+    setup_logging(log_path)
+    logger.info("AI Resume Creator Flask Server starting...")
+    
+    # Log server configuration
+    port = int(os.environ.get('PORT', 3000))
+    debug_mode = os.environ.get('FLASK_ENV') == 'development'
+    
+    logger.info(f"Server configuration:")
+    logger.info(f"  - Host: 0.0.0.0")
+    logger.info(f"  - Port: {port}")
+    logger.info(f"  - Debug mode: {debug_mode}")
+    logger.info(f"  - Log file: {log_path}")
     
     # Run the Flask app
-    app.run(
-        host='0.0.0.0',
-        port=int(os.environ.get('PORT', 3000)),
-        debug=os.environ.get('FLASK_ENV') == 'development'
-    )
+    try:
+        app.run(
+            host='0.0.0.0',
+            port=port,
+            debug=debug_mode
+        )
+    except Exception as e:
+        logger.error(f"Failed to start Flask server: {e}")
+        raise

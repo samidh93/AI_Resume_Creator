@@ -8,6 +8,10 @@ from job_description_interface import JobDescriptionInterface
 from resume_parser import ResumeParser
 import re
 from ai_interface import AIInterface
+import logging
+
+# Set up logger for this module
+logger = logging.getLogger(__name__)
 
 class ATSResult(BaseModel):
     ats_score: int
@@ -21,23 +25,42 @@ class JobSkills(BaseModel):
 class ResumeAnalyzer:
     def __init__(self,  job_description:str, resume:ResumeParser):
         #openai.api_key = api_key
-        # Create the AI interface
-        self.model = AIInterface(
-                model_provider="ollama",
-                model_name= "qwen2.5:3b", #"llama3.2:latest",              
-                temperature=0,
-                #max_tokens=100,
-                format="json"
-            )
+        logger.info("Initializing ResumeAnalyzer")
+        
+        try:
+            # Create the AI interface
+            self.model = AIInterface(
+                    model_provider="ollama",
+                    model_name= "qwen2.5:3b", #"llama3.2:latest",              
+                    temperature=0,
+                    #max_tokens=100,
+                    format="json"
+                )
+            logger.info("AI interface initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize AI interface: {e}")
+            raise
+            
         self.matched_skills = []
         self.missing_skills = []
         self.suggested_improvements = ""
         self.job_description_text = re.sub(r'\s+', ' ', job_description).strip()
         self.resume_text = resume.get_required_fields_for_ats()
-        self.job_required_skills = self.get_job_required_skills()
+        logger.info(f"Job description processed: {len(self.job_description_text)} characters")
+        logger.info(f"Resume text extracted: {len(self.resume_text)} characters")
+        
+        # Extract job skills
+        try:
+            self.job_required_skills = self.get_job_required_skills()
+            logger.info("Job skills extraction completed successfully")
+        except Exception as e:
+            logger.error(f"Failed to extract job skills: {e}")
+            raise
 
     def get_job_required_skills(self):
         """use AI to extradct required skills from job description"""
+        logger.info("Starting job skills extraction using AI")
+        
         prompt = f"""
         extract required skills from job description:
         {self.job_description_text}
@@ -51,13 +74,35 @@ class ResumeAnalyzer:
         }}
         ```
         """
-        response_content = self.model.get_completion(prompt=prompt)
-        print("response_content: ", response_content)
-        return JobSkills(**json.loads(response_content))
+        
+        logger.debug(f"AI prompt prepared for skill extraction: {len(prompt)} characters")
+        
+        try:
+            response_content = self.model.get_completion(prompt=prompt)
+            logger.debug(f"AI response received: {len(response_content)} characters")
+            
+            job_skills = JobSkills(**json.loads(response_content))
+            logger.info(f"Successfully extracted {len(job_skills.required_skills)} required skills")
+            
+            # Log extracted skills for debugging
+            for skill in job_skills.required_skills:
+                logger.debug(f"Extracted skill: {skill.get('name', 'Unknown')} ({skill.get('category', 'Unknown')} - {skill.get('level', 'Unknown')})")
+            
+            return job_skills
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse AI response as JSON: {e}")
+            logger.debug(f"Raw AI response: {response_content}")
+            raise
+        except Exception as e:
+            logger.error(f"Error extracting job skills: {e}")
+            raise
     
 
     def compare(self) -> ATSResult:
         """Calculate the ATS score for the resume based on the job description."""
+        logger.info("Starting ATS comparison analysis")
+        
         system_prompt = f"""
         You are an Applicant Tracking System (ATS) that evaluates resumes against job descriptions.
         Return **only** a **JSON object** with the following **exact** structure:
@@ -78,7 +123,7 @@ class ResumeAnalyzer:
         **Resume:**
         {self.resume_text}
         """        
-        print("user_prompt: ", user_prompt)
+        logger.debug(f"ATS analysis prompt prepared: {len(user_prompt)} characters")
         #response = openai.chat.completions.create(
         #    model="gpt-4o-mini",
         #    response_format={"type": "json_object"},
@@ -93,9 +138,31 @@ class ResumeAnalyzer:
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
             ]
-        response_content = self.model.get_completion(messages)
-        print("response_content: ", response_content)
-        return ATSResult(**json.loads(response_content))
+        try:
+            logger.debug("Sending ATS analysis request to AI model")
+            response_content = self.model.get_completion(messages)
+            logger.debug(f"ATS analysis response received: {len(response_content)} characters")
+            
+            ats_result = ATSResult(**json.loads(response_content))
+            
+            logger.info(f"ATS analysis completed successfully:")
+            logger.info(f"  - ATS Score: {ats_result.ats_score}")
+            logger.info(f"  - Missing Skills: {len(ats_result.missing_skills)}")
+            logger.info(f"  - Suggestions: {len(ats_result.suggested_improvements)} characters")
+            
+            # Log missing skills for debugging
+            for skill in ats_result.missing_skills:
+                logger.debug(f"Missing skill: {skill.get('name', 'Unknown')} ({skill.get('category', 'Unknown')} - {skill.get('level', 'Unknown')})")
+            
+            return ats_result
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse ATS analysis response as JSON: {e}")
+            logger.debug(f"Raw AI response: {response_content}")
+            raise
+        except Exception as e:
+            logger.error(f"Error during ATS comparison: {e}")
+            raise
 
 
 if __name__ == "__main__":
