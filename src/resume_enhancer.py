@@ -65,6 +65,75 @@ class ResumeEnhancer:
         sanitized = re.sub(r'[<>:"/\\|?*]', '', text)  # Remove invalid filename chars
         sanitized = re.sub(r'\s+', '_', sanitized)      # Replace spaces with underscores
         return sanitized
+
+    def _validate_summary(self, summary_text: str) -> str:
+        """Validate and clean the AI-generated summary to remove meta-commentary."""
+        logger.debug("Validating AI-generated summary for meta-commentary")
+        
+        # Define forbidden phrases that indicate meta-commentary
+        forbidden_phrases = [
+            "ats score", "enhance your", "could further", "would improve",
+            "highlighting experience", "apis could", "technologies like",
+            "further enhance", "ats compatibility", "resume optimization",
+            "keyword optimization", "improve your chances"
+        ]
+        
+        cleaned_summary = summary_text.strip()
+        original_length = len(cleaned_summary)
+        
+        # Check for and remove sentences containing forbidden phrases
+        sentences = cleaned_summary.split('. ')
+        filtered_sentences = []
+        
+        for sentence in sentences:
+            sentence_lower = sentence.lower()
+            contains_forbidden = any(phrase in sentence_lower for phrase in forbidden_phrases)
+            
+            if contains_forbidden:
+                logger.warning(f"Removing meta-commentary sentence: '{sentence[:50]}...'")
+            else:
+                filtered_sentences.append(sentence)
+        
+        # Reconstruct the summary
+        if filtered_sentences:
+            cleaned_summary = '. '.join(filtered_sentences)
+            # Ensure proper ending punctuation
+            if not cleaned_summary.endswith('.'):
+                cleaned_summary += '.'
+        else:
+            logger.warning("All sentences contained meta-commentary, keeping original summary")
+            return self.resume_data.get("summary", "")
+        
+        logger.info(f"Summary validation completed: {original_length} -> {len(cleaned_summary)} characters")
+        return cleaned_summary
+    
+    def _filter_relevant_skills(self, missing_skills: list, job_description_text: str = "") -> list:
+        """Filter missing skills to only include those relevant to the job description."""
+        logger.debug(f"Filtering {len(missing_skills)} missing skills for relevance")
+        
+        if not job_description_text:
+            # If no job description provided, return all skills
+            logger.debug("No job description provided, returning all missing skills")
+            return missing_skills
+        
+        relevant_skills = []
+        job_description_lower = job_description_text.lower()
+        
+        for skill in missing_skills:
+            if isinstance(skill, dict) and 'name' in skill:
+                skill_name = skill['name'].lower()
+                
+                # Check if skill name appears in job description
+                if skill_name in job_description_lower:
+                    relevant_skills.append(skill)
+                    logger.debug(f"Skill '{skill['name']}' found relevant to job description")
+                else:
+                    logger.debug(f"Skill '{skill['name']}' not found in job description, filtering out")
+            else:
+                logger.warning(f"Invalid skill format: {skill}")
+        
+        logger.info(f"Filtered skills: {len(missing_skills)} -> {len(relevant_skills)} relevant skills")
+        return relevant_skills
     
     def _save_resume(self) -> str:
         """Saves the enhanced resume to a new YAML file in the company_resume directory."""
@@ -114,7 +183,12 @@ class ResumeEnhancer:
             logger.info("✅ No missing skills identified by ATS analysis")
         
         try:
-            self._add_missing_skills(ats_result.missing_skills)
+            # Filter skills to only include job-relevant ones
+            # Note: We don't have direct access to job description here, so we use all skills
+            # In a future enhancement, we could pass job description to this method
+            filtered_skills = ats_result.missing_skills
+            
+            self._add_missing_skills(filtered_skills)
             self._update_summary(ats_result)
             enhanced_path = self._save_resume()
             logger.info("🎉 Resume enhancement completed successfully")
@@ -130,25 +204,40 @@ class ResumeEnhancer:
         current_summary = self.resume_data.get("summary", "")
         logger.debug(f"Current summary length: {len(current_summary)} characters")
         
+        # Extract only skill names from missing skills
+        missing_skill_names = []
+        for skill in ats_result.missing_skills:
+            if isinstance(skill, dict) and 'name' in skill:
+                missing_skill_names.append(skill['name'])
+        
+        missing_skills_text = ", ".join(missing_skill_names)
+        
         prompt = f"""
-                improve this summary by naturally incorproating the following missing skills and suggested improvements.
-
-                Summary:
-                {current_summary}
-                
-                missing_skills: {ats_result.missing_skills}
-                suggested_improvements: {ats_result.suggested_improvements}
-                
-                Return only the JSON output without any explanation. 
-                Key is summary and value is the updated summary.
-                """
+        Rewrite this professional resume summary by naturally incorporating the missing skills listed below. 
+        
+        RULES:
+        - Keep the same professional tone and structure
+        - Only add the missing skills naturally into existing sentences
+        - Do NOT add any meta-commentary, suggestions, or advice
+        - Do NOT mention "ATS score" or similar phrases
+        - Do NOT add explanatory text about what would improve anything
+        - Return ONLY the improved summary text, nothing else
+        
+        Current Summary:
+        {current_summary}
+        
+        Missing Skills to incorporate naturally:
+        {missing_skills_text}
+        
+        Return only the JSON output with key "summary" and the enhanced summary as the value.
+        """
         
         logger.debug(f"AI prompt prepared: {len(prompt)} characters")
         
-        messages=[
-                {"role": "system", "content": "You are an expert that evaluates resumes for ATS compatibility."},
-                {"role": "user", "content": prompt}
-            ]
+        messages = [
+            {"role": "system", "content": "You are a professional resume writer. Write only resume content, never include advice or meta-commentary."},
+            {"role": "user", "content": prompt}
+        ]
         
         try:
             logger.debug("Sending request to AI model for summary enhancement")
@@ -158,8 +247,11 @@ class ResumeEnhancer:
             response_data = json.loads(response)
             new_summary = response_data["summary"]
             
-            self.resume_data["summary"] = new_summary
-            logger.info(f"Summary updated successfully: {len(current_summary)} -> {len(new_summary)} characters")
+            # Validate and clean the summary
+            validated_summary = self._validate_summary(new_summary)
+            
+            self.resume_data["summary"] = validated_summary
+            logger.info(f"Summary updated successfully: {len(current_summary)} -> {len(validated_summary)} characters")
             
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse AI response as JSON: {e}")

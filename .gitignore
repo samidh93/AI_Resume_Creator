@@ -79,6 +79,7 @@ input/*.yaml
 input/*.pdf
 input/*.html
 input/*.css
+input/img/
 output/jobs
 
 .vscode

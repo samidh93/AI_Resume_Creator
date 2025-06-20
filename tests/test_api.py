@@ -45,9 +45,11 @@ def test_generate_resume():
                 'language': 'en',
                 'job_data': json.dumps({
                     'job_id': '123',
-                    'job_title': 'Software Engineer',
-                    'job_description': """wir suchen einen Softwareentwickler mit 6 Jahren Erfahrung in Cloud Computing und DevOps, insbesondere in AWS und Azure. SAP ist ein Plus.""",
-                    'company_name': 'Adesso'
+                    'job_title': 'Senior System Engineer',
+                    'job_description': """
+
+                    """,
+                    'company_name': 'Expleo'
                 })
             }
             
