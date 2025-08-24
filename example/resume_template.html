@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="{{ labels.lang or 'en' }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ personal_information.name }} {{ personal_information.surname }} - Resume</title>
+    <link rel="stylesheet" href="../../example/styles.css">
+</head>
+
+<body>
+    <header style="display: flex; align-items: flex-start; gap: 20px;">
+        <img src="../../input/img/foto.jpg" alt="Profile Photo" style="width: 140px; height: 140px; object-fit: cover; object-position: center 0%; border-radius: 50%; margin-top: 10px; margin-left: 40px;">
+        
+        <div>
+            <h1>{{ personal_information.name }} {{ personal_information.surname }}</h1>
+            <p>🏠 {{ personal_information.city }}, {{ personal_information.country }}</p>
+            <p> 
+                {% if personal_information.citizenship is defined %}
+                📘 {{ personal_information.citizenship }}
+                {% endif %}
+            </p>
+            <p>📞 {{ personal_information.phone_prefix }} {{ personal_information.phone }}</p>
+            <p>✉️ <a href="mailto:{{ personal_information.email }}">{{ personal_information.email }}</a></p>
+            <p>💼 <a href="{{ personal_information.linkedin }}" target="_blank">LinkedIn</a> 
+                {% if personal_information.github is defined %}
+                | 🖥️ <a href="{{ personal_information.github }}" target="_blank">GitHub</a>
+                {% endif %}
+            </p>
+        </div>
+    </header>
+    
+
+    <section>
+        <h2>{{ labels.summary }}</h2>
+        <p>{{ summary }}</p>
+    </section>
+
+    <section>
+        <h2>{{ labels.experience }}</h2>
+        {% for exp in experiences %}
+        <h3>{{ exp.position }}</h3>
+        <p><strong>{{ exp.company }}</strong> | {{ exp.employment_period }} | {{ exp.location }}</p>
+
+        <h4>{{ labels.key_responsibilities }}</h4>
+        <ul>
+            {% for res in exp.key_responsibilities %}
+            <li>{{ res.description }}</li>
+            {% endfor %}
+        </ul>
+
+        <h4>{{ labels.skills_acquired }}</h4>
+        <ul>
+            {% for skill in exp.skills_acquired %}
+            <li>{{ skill }}</li>
+            {% endfor %}
+        </ul>
+        {% endfor %}
+    </section>
+
+    <section>
+        <h2>{{ labels.education }}</h2>
+        {% for edu in education %}
+        <h3>{{ edu.degree }}</h3>
+        <ul>
+            <li><strong>{{ labels.field_of_study }}:</strong> {{ edu.field_of_study }}</li>
+            <li><strong>{{ labels.institution }}:</strong> {{ edu.university }}</li>
+            <li><strong>{{ labels.graduation_year }}:</strong> {{ edu.graduation_year }}</li>
+        </ul>
+        {% endfor %}
+    </section>
+
+    <section>
+        <h2>{{ labels.skills }}</h2>
+        {% for category, skills_list in skills | groupby('category') %}
+        <h3>{{ category }}</h3>
+        <ul>
+            {% for skill in skills_list %}
+            <li>{{ skill.name }} ({{ skill.level }})</li>
+            {% endfor %}
+        </ul>
+        {% endfor %}
+    </section>
+
+    <section>
+        <h2>{{ labels.languages }}</h2>
+        <ul>
+            {% for lang in languages %}
+            <li>{{ lang.language }} - {{ lang.proficiency }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <section>
+        <h2>{{ labels.projects }}</h2>
+        {% for project in projects %}
+        <h3>{{ project.name }}</h3>
+        <ul>
+            <li><strong>{{ labels.role }}:</strong> {{ project.role }}</li>
+            <li><strong>{{ labels.description }}:</strong> {{ project.description }}</li>
+            {% if project.year is defined %}
+            <li><strong>{{ labels.year }}:</strong> {{ project.year }}</li>
+            {% endif %}
+            {% if project.link is defined %}
+            <li><strong>{{ labels.link }}:</strong> <a href="{{ project.link }}" target="_blank">{{ labels.view_project }}</a></li>
+            {% endif %}
+            {% if project.skills is defined %}
+            <li><strong>{{ labels.skills }}:</strong> {{ project.skills | join(', ') }}</li>
+            {% endif %}
+        </ul>
+        {% endfor %}
+    </section>
+
+    <section>
+        <h2>{{ labels.certifications }}</h2>
+        {% for cert in certifications %}
+        <h3>{{ cert.name }}</h3>
+        <ul>
+            <li><strong>{{ labels.issuer }}:</strong> {{ cert.issuer }}</li>
+            {% if cert.date is defined %}
+            <li><strong>{{ labels.date_of_issuance }}:</strong> {{ cert.date }}</li>
+            {% endif %}
+            {% if cert.url is defined %}
+            <li><strong>{{ labels.certificate }}:</strong> <a href="{{ cert.url }}" target="_blank">{{ labels.view }}</a></li>
+            {% endif %}
+        </ul>
+        {% endfor %}
+    </section>
+
+    <section>
+        <h2>{{ labels.interests }}</h2>
+        <ul>
+            {% for interest in interests %}
+            <li>{{ interest }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+</body>
+
+</html>
