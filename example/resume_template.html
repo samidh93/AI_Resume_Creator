@@ -5,12 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ personal_information.name }} {{ personal_information.surname }} - Resume</title>
-    <link rel="stylesheet" href="../../example/styles.css">
+    <link rel="stylesheet" href="../example/styles.css">
 </head>
 
 <body>
     <header style="display: flex; align-items: flex-start; gap: 20px;">
-        <img src="../../input/img/foto.jpg" alt="Profile Photo" style="width: 140px; height: 140px; object-fit: cover; object-position: center 0%; border-radius: 50%; margin-top: 10px; margin-left: 40px;">
+        <img src="../input/img/foto.jpg" alt="Profile Photo" style="width: 140px; height: 140px; object-fit: cover; object-position: center 0%; border-radius: 50%; margin-top: 10px; margin-left: 40px;">
         
         <div>
             <h1>{{ personal_information.name }} {{ personal_information.surname }}</h1>
@@ -125,15 +125,6 @@
             {% endif %}
         </ul>
         {% endfor %}
-    </section>
-
-    <section>
-        <h2>{{ labels.interests }}</h2>
-        <ul>
-            {% for interest in interests %}
-            <li>{{ interest }}</li>
-            {% endfor %}
-        </ul>
     </section>
 </body>
 
