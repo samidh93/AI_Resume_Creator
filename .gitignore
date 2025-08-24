@@ -86,4 +86,6 @@ output/jobs
 
 company_resume
 generated_resume
-.devcontainer
+
+# Development containers
+.devcontainer/
