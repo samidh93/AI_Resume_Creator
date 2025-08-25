@@ -64,7 +64,7 @@ class ResumeGenerator:
             "summary": "Summary",
             "experience": "Experience",
             "education": "Education",
-            "skills": "Skills",
+            "skills": "Technical Skills",
             "languages": "Languages",
             "projects": "Projects",
             "certifications": "Certifications",

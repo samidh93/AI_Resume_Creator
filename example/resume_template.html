@@ -42,19 +42,12 @@
         <h3>{{ exp.position }}</h3>
         <p><strong>{{ exp.company }}</strong> | {{ exp.employment_period }} | {{ exp.location }}</p>
 
-        <h4>{{ labels.key_responsibilities }}</h4>
         <ul>
             {% for res in exp.key_responsibilities %}
             <li>{{ res.description }}</li>
             {% endfor %}
         </ul>
 
-        <h4>{{ labels.skills_acquired }}</h4>
-        <ul>
-            {% for skill in exp.skills_acquired %}
-            <li>{{ skill }}</li>
-            {% endfor %}
-        </ul>
         {% endfor %}
     </section>
 
@@ -72,14 +65,15 @@
 
     <section>
         <h2>{{ labels.skills }}</h2>
-        {% for category, skills_list in skills | groupby('category') %}
-        <h3>{{ category }}</h3>
         <ul>
-            {% for skill in skills_list %}
-            <li>{{ skill.name }} ({{ skill.level }})</li>
+            {% for category, skills_list in skills | groupby('category') %}
+            <li><strong>{{ category }}:</strong> 
+                {% for skill in skills_list %}
+                {{ skill.name }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </li>
             {% endfor %}
         </ul>
-        {% endfor %}
     </section>
 
     <section>
